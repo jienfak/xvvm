@@ -73,13 +73,15 @@ static const char *kblcmd[]= {"sh", "-c", "if setxkbmap -print | grep dvorak ; t
                                           "else\n"
                                               "setxkbmap -layout us,ru -variant dvorak, -option grp:caps_toggle\n"
                                           "fi", NULL};
-static const char *ibcmd[] = {"surft", NULL}; /* Browser opening. */
+static const char *ibcmd[] = {"jsurf", NULL}; /* Internet Browser. */
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Spawn terminal.     */
 	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd } },     /* Spawn file manager. */
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Spawn music player. */
+	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },
 	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
