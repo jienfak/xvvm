@@ -16,15 +16,16 @@ static const int topbar             = 1;        /* 0 means bottom bar.      */
 static const char *fonts[]          = { "monospace:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
-static const char col_gray2[]       = "#444444";
+static const char col_gray2[]       = "#333333";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#005577";
 static const char col_red2[]        = "#FF0000";
 static const char col_red1[]        = "#880000";
+static const char col_blue[]        = "#0000FF";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
+	[SchemeNorm] = { col_gray3, col_gray1, col_cyan  },
 	[SchemeSel]  = { col_gray4, col_red1,  col_red2  },
 };
 
@@ -78,6 +79,8 @@ static const char *kblcmd[]= {"sh", "-c", "if setxkbmap -print | grep dvorak ; t
                                               "setxkbmap -layout us,ru -variant dvorak, -option grp:caps_toggle\n"
                                           "fi", NULL};
 static const char *ibcmd[] = {"jsurf", NULL}; /* Internet Browser. */
+/* Move mouse to choosed window. */
+static const char *mousemvcmd[] = {"sh", "-c", "xdotool mousemove --window $(xdotool getactivewindow) 20 20", NULL};
 
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
@@ -89,7 +92,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
+	{ MODKEY,                       XK_j,      spawn,          {.v = mousemvcmd} },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },       /* Change focus via keyboard(Previous). */
+	{ MODKEY,                       XK_k,      spawn,          {.v = mousemvcmd} },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },       /* Increase size of window table stack. */
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },       /* Decrease size of window table stack. */
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },     /* Decrease master window size. */
