@@ -69,7 +69,7 @@ static const Layout layouts[] = {
 
 /* Commands. */
 static char dmenumon[2] = "0"; /* Component of dmenucmd, manipulated in spawn(). */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL }; /* DMenu. */
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, NULL }; /* DMenu. */
 static const char *termcmd[]  = { "st", "-e", "tmux", "new-session", NULL };    /*Terminal. */
 static const char *fmcmd[] = {"st", "-e", "tmux", "new-session",  "lf", NULL }; /* File manager. */
 static const char *mpcmd[] = {"st", "-e", "tmux", "new-session", "cmus", NULL}; /* Music player. */
