@@ -86,6 +86,7 @@ static const char *mpcmd[] = SHCMD("st -e tmux new-session cmus") ;
 
 /* Toggle dvorak layout.*/
 static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
+		                                      "setxkbmap -layout us,ru  -option grp:caps_toogle\n"
                                           "else\n"
                                               "setxkbmap -layout us,ru -variant dvorak, -option grp:caps_toggle\n"
                                           "fi");
@@ -96,6 +97,9 @@ static const char *mousemvcmd[] = SHCMD( "xdotool mousemove --window $(xdotool g
 /* Network control. */
 static const char *nctlcmd[] = SHCMD("st -e tmux new-session wicd-curses");
 
+/* Editor. */
+static const char *edcmd[] = {"gvim", NULL};
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
@@ -104,6 +108,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Spawn music player. */
 	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Spawn browser. */
 	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd }},   /* Network control. */
+	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = edcmd}},      /* Editor. */
 	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
