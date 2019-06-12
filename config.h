@@ -64,31 +64,46 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, /* Move current window to this tag. */\
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} }, /* Link current wiwond to this tag. */
 
-/* Helper for spawning shell commands in the pre dwm-5.0 fashion. */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
+/* Easier CMD assigning. */
+#define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, NULL }/*)*/
+/* Helper to spawn application in terminal. */
 
 /* Commands. */
 static char dmenumon[2] = "0"; /* Component of dmenucmd, manipulated in spawn(). */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, NULL }; /* DMenu. */
-static const char *termcmd[]  = { "st", "-e", "tmux", "new-session", NULL };    /*Terminal. */
-static const char *fmcmd[] = {"st", "-e", "tmux", "new-session",  "lf", NULL }; /* File manager. */
-static const char *mpcmd[] = {"st", "-e", "tmux", "new-session", "cmus", NULL}; /* Music player. */
-static const char *kblcmd[]= {"sh", "-c", "if setxkbmap -print | grep dvorak ; then\n" /* Toggle dvorak layout.*/
-                                              "setxkbmap -layout us,ru -option grp:caps_toggle\n"
+static char * dmenucmd[] = { "dmenu_run", "-m", dmenumon, NULL }; /* DMenu. */
+
+ /*Terminal. */
+/*{ "st", "-e", "tmux", "new-session", NULL }*/ 
+static const char *termcmd[]  = SHCMD("st -e tmux new-session") ;
+
+/* File manager. */
+/*{"st", "-e", "tmux", "new-session",  "lf", NULL } */
+static const char *fmcmd[] = SHCMD("st -e tmux new-session lf"); 
+
+/* Music player. */
+/* {"st", "-e", "tmux", "new-session", "cmus", NULL} */
+static const char *mpcmd[] = SHCMD("st -e tmux new-session cmus") ; 
+
+/* Toggle dvorak layout.*/
+static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
                                           "else\n"
                                               "setxkbmap -layout us,ru -variant dvorak, -option grp:caps_toggle\n"
-                                          "fi", NULL};
-static const char *ibcmd[] = {"jsurf", NULL}; /* Internet Browser. */
+                                          "fi");
+static const char *ibcmd[] = SHCMD("jsurf"); /* Internet Browser. */
 /* Move mouse to choosed window. */
-static const char *mousemvcmd[] = {"sh", "-c", "xdotool mousemove --window $(xdotool getactivewindow) 20 20", NULL};
+static const char *mousemvcmd[] = SHCMD( "xdotool mousemove --window $(xdotool getactivewindow) 20 20");
+
+/* Network control. */
+static const char *nctlcmd[] = SHCMD("st -e tmux new-session wicd-curses");
 
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Spawn terminal.     */
-	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd } },     /* Spawn file manager. */
+	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd } },    /* Spawn file manager. */
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Spawn music player. */
-	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },
+	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Spawn browser. */
+	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd }},   /* Network control. */
 	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
