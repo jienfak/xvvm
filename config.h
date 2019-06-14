@@ -124,9 +124,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
-	{ MODKEY,                       XK_j,      spawn,          {.v = mousemvcmd} },
+	/*{ MODKEY,                       XK_j,      spawn,          {.v = mousemvcmd} },*/
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },       /* Change focus via keyboard(Previous). */
-	{ MODKEY,                       XK_k,      spawn,          {.v = mousemvcmd} },
+	/*{ MODKEY,                       XK_k,      spawn,          {.v = mousemvcmd} },*/
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },       /* Increase size of window table stack. */
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },       /* Decrease size of window table stack. */
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },     /* Decrease master window size. */
