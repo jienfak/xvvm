@@ -100,15 +100,27 @@ static const char *nctlcmd[] = SHCMD("st -e tmux new-session wicd-curses");
 /* Editor. */
 static const char *edcmd[] = {"gvim", NULL};
 
+/* Sound mixer. */
+static const char *sndcmd[] = SHCMD("st -e tmux new-session alsamixer");
+
+/* Hardware info. */
+static const char *hwcmd[] = {"hardinfo", NULL};
+
+/* IRC chat program. */
+static const char *irccmd[] = SHCMD("st -e tmux new-session weechat");
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Spawn terminal.     */
-	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd } },    /* Spawn file manager. */
+	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* Spawn file manager. */
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Spawn music player. */
 	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Spawn browser. */
-	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd }},   /* Network control. */
-	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = edcmd}},      /* Editor. */
+	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd} },   /* Network control. */
+	{ MODKEY|ShiftMask,             XK_e,      spawn,          {.v = edcmd} },     /* Editor. */
+	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = sndcmd} },    /* Sound mixer. */
+	{ MODKEY|ShiftMask,             XK_h,      spawn,          {.v = hwcmd }},     /* Hardware info. */
+	{ MODKEY|ShiftMask,             XK_c,      spawn,          {.v = irccmd }},    /* IRC chat program. */
 	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
@@ -121,14 +133,13 @@ static Key keys[] = {
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },     /* Increase master window size. */
 	{ MODKEY,                       XK_Return, zoom,           {0} },              /* Current choosen window master. */
 	{ MODKEY,                       XK_Tab,    view,           {0} },              /* Change current choosen window to master. */
-	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },              /* Close current window. */
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /* Tabbed layout.    */
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
-	{ MODKEY,                       XK_space,  setlayout,      {0} },                /* Next layout. */
+	{ MODKEY,                       XK_space,  setlayout,      {0} },                /* Toggle layout. */
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } }, /* Toggle all tags. */
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } }, /* */
+	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } }, /* Move window to the next tag. */
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
@@ -142,7 +153,8 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ MODKEY|ControlMask,           XK_q,      quit,           {0} },  /* Quit dwm. */
+	{ MODKEY|ControlMask,           XK_c,      killclient,     {0} },  /* Close current window. */
 };
 
 /* Button definitions. */
