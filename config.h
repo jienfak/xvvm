@@ -86,9 +86,9 @@ static const char *mpcmd[] = SHCMD("st -e tmux new-session cmus") ;
 
 /* Toggle dvorak layout.*/
 static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
-		                                      "setxkbmap -layout us,ru  -option grp:caps_toogle\n"
+		                                      "setxkbmap -layout us,ru  -option grp:alt_space_toggle\n"
                                           "else\n"
-                                              "setxkbmap -layout us,ru -variant dvorak, -option grp:caps_toggle\n"
+                                              "setxkbmap -layout us,ru -variant dvorak, -option grp:alt_space_toggle\n"
                                           "fi");
 static const char *ibcmd[] = SHCMD("jsurf"); /* Internet Browser. */
 /* Move mouse to choosed window. */
