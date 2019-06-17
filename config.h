@@ -89,7 +89,8 @@ static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
 		                                      "setxkbmap -layout us,ru  -option grp:alt_space_toggle\n"
                                           "else\n"
                                               "setxkbmap -layout us,ru -variant dvorak, -option grp:alt_space_toggle\n"
-                                          "fi");
+                                          "fi\n"
+                                    "xmodmap ~/.Xmodmap");
 static const char *ibcmd[] = SHCMD("jsurf"); /* Internet Browser. */
 /* Move mouse to choosed window. */
 static const char *mousemvcmd[] = SHCMD( "xdotool mousemove --window $(xdotool getactivewindow) 20 20");
