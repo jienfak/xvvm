@@ -142,7 +142,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
 	{ MODKEY,                       XK_space,  setlayout,      {0} },                /* Toggle layout. */
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
+	{ MODKEY|ControlMask,           XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } }, /* Toggle all tags. */
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } }, /* Move window to the next tag. */
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
