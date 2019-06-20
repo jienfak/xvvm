@@ -110,11 +110,15 @@ static const char *hwcmd[] = {"hardinfo", NULL};
 /* IRC chat program. */
 static const char *irccmd[] = SHCMD("st -e tmux new-session weechat");
 
-/* Excucte program inside of st. */
+/* Execute program inside of st. */
 static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|dmenu -m $0)\\\"\"", dmenumon, NULL};
+
+/* Lock the screen. */
+static const char *lockcmd[] = SHCMD("slock");
 
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
+	{ MODKEY|ShiftMask|ControlMask, XK_l,      spawn,          {.v lockcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
 	{ MODKEY,                       XK_r,      spawn,          {.v = estcmd } },   /* Execute it terminal. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Spawn terminal.     */
