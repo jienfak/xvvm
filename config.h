@@ -41,7 +41,6 @@ static const Rule rules[] = {
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       0,            0,           -1 },
 	{ "mpv",      NULL,       NULL,       0,            1,           -1 },
-	{ "Ardour",   NULL,       NULL,       0,            1,           -1 }
 };
 
 /* Layout(s). */
@@ -116,10 +115,14 @@ static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|
 /* Lock the screen. */
 static const char *lockcmd[] = SHCMD("slock");
 
+/* Path type cmd. */
+static const char *dmfilecmd[] = SHCMD("xdotool type \"$(dmenu_file)\"");
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	{ MODKEY|ShiftMask|ControlMask, XK_l,      spawn,          {.v lockcmd } },
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
+	{ MODKEY,                       XK_f,      spawn,          {.v = dmfilecmd }},
 	{ MODKEY,                       XK_r,      spawn,          {.v = estcmd } },   /* Execute it terminal. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Spawn terminal.     */
 	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* Spawn file manager. */
@@ -143,8 +146,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Return, zoom,           {0} },              /* Current choosen window master. */
 	{ MODKEY,                       XK_Tab,    view,           {0} },              /* Change current choosen window to master. */
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /* Tabbed layout.    */
-	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
+	{ MODKEY|ControlMask,           XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
+	{ MODKEY|ControlMask,           XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
 	{ MODKEY,                       XK_space,  setlayout,      {0} },                /* Toggle layout. */
 	{ MODKEY|ControlMask,           XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } }, /* Toggle all tags. */
