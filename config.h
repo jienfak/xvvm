@@ -69,7 +69,7 @@ static const Layout layouts[] = {
 
 /* Commands. */
 static char dmenumon[2] = "0"; /* Component of dmenucmd, manipulated in spawn(). */
-static char * dmenucmd[] = { "dmenu_run", "-m", dmenumon, NULL }; /* DMenu. */
+static char * dmenucmd[] = { "dmenu_run", "-p", "&", "-m", dmenumon, NULL }; /* DMenu. */
 
  /*Terminal. */
 /*{ "st", "-e", "tmux", "new-session", NULL }*/ 
@@ -83,6 +83,9 @@ static const char *fmcmd[] = SHCMD("st -e tmux new-session lf");
 /* {"st", "-e", "tmux", "new-session", "cmus", NULL} */
 static const char *mpcmd[] = SHCMD("st -e tmux new-session cmus") ; 
 
+/* Image viewer. */
+static const char *imgcmd[] = SHCMD("cd \"$(xdg-user-dir PICTURES)\" ; vimiv");
+
 /* Toggle dvorak layout.*/
 static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
 		                                      "setxkbmap -layout us,ru  -option grp:alt_space_toggle\n"
@@ -92,7 +95,7 @@ static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
                                     "xmodmap ~/.Xmodmap");
 static const char *ibcmd[] = SHCMD("jsurf"); /* Internet Browser. */
 /* Move mouse to choosed window. */
-static const char *mousemvcmd[] = SHCMD( "xdotool mousemove --window $(xdotool getactivewindow) 20 20");
+static const char *mousemvcmd[] = SHCMD( "swarp $(xdotool getwindowgeometry $(xdotool getactivewindow) | grep Position | awk '{print $2}' | sed 's/,/ /')");
 
 /* Network control. */
 static const char *nctlcmd[] = SHCMD("st -e tmux new-session wicd-curses");
@@ -110,7 +113,7 @@ static const char *hwcmd[] = {"hardinfo", NULL};
 static const char *irccmd[] = SHCMD("st -e tmux new-session weechat");
 
 /* Execute program inside of st. */
-static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|dmenu -m $0)\\\"\"", dmenumon, NULL};
+static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|dmenu -p '!' -m $0)\\\"\"", dmenumon, NULL};
 
 /* Lock the screen. */
 static const char *lockcmd[] = SHCMD("slock");
@@ -118,40 +121,54 @@ static const char *lockcmd[] = SHCMD("slock");
 /* Path type cmd. */
 static const char *dmfilecmd[] = SHCMD("xdotool type \"$(dmenu_file)\"");
 
+/* Dictionary typing. */
+static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dict/en_words_alpha.txt)\"");
+
+/* Phrases access. */
+static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
-	{ MODKEY|ShiftMask|ControlMask, XK_l,      spawn,          {.v lockcmd } },
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } }, /* Spawn menu to launch program. */
-	{ MODKEY,                       XK_f,      spawn,          {.v = dmfilecmd }},
-	{ MODKEY,                       XK_r,      spawn,          {.v = estcmd } },   /* Execute it terminal. */
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Spawn terminal.     */
-	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* Spawn file manager. */
-	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Spawn music player. */
+	/* Program spawners. */
+	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
+	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute. */
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal.     */
+	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* File manager. */
+	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Music player. */
 	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Spawn browser. */
+	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = imgcmd} },    /* Image viewer. */
 	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd} },   /* Network control. */
 	{ MODKEY|ShiftMask,             XK_e,      spawn,          {.v = edcmd} },     /* Editor. */
 	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = sndcmd} },    /* Sound mixer. */
 	{ MODKEY|ShiftMask,             XK_h,      spawn,          {.v = hwcmd }},     /* Hardware info. */
 	{ MODKEY|ShiftMask,             XK_c,      spawn,          {.v = irccmd }},    /* IRC chat program. */
-	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },    /* Toggle dvorak. */
-	{ MODKEY,                       XK_b,      togglebar,      {0} },              /* Toggle bar with tags and other. */
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },       /* Change focus via keyboard(Next). */
+
+	/* Windows stuff and input(The most needed). */
+
+	{ MODKEY,                       XK_e,      spawn,          {.v = phrcmd }},      /* Oftenly used phrases to type. */
+	{ MODKEY,                       XK_slash,  spawn,          {.v = dmfilecmd }},   /* Comfortable path input with dmenu . */
+	{ MODKEY,                       XK_w,      spawn,          {.v = dictcmd}},      /* Type word from the dictionary. */
+	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },      /* Toggle dvorak. */
+	{ MODKEY,                       XK_c,      killclient,     {0} },                /* Close current window. */
+	{ MODKEY,                       XK_b,      togglebar,      {0} },                /* Toggle bar with tags and other. */
+	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },         /* Change focus via keyboard(Next). */
 	/*{ MODKEY,                       XK_j,      spawn,          {.v = mousemvcmd} },*/
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },       /* Change focus via keyboard(Previous). */
-	/*{ MODKEY,                       XK_k,      spawn,          {.v = mousemvcmd} },*/
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },       /* Increase size of window table stack. */
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },       /* Decrease size of window table stack. */
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },     /* Decrease master window size. */
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },     /* Increase master window size. */
-	{ MODKEY,                       XK_Return, zoom,           {0} },              /* Current choosen window master. */
-	{ MODKEY,                       XK_Tab,    view,           {0} },              /* Change current choosen window to master. */
+	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },         /* Change focus via keyboard(Previous). */
+	/*{ MODKEY,                       XK_k,      spawn,          {.v = mousemvcmd} }, */
+	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },         /* Increase size of window table stack. */
+	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },         /* Decrease size of window table stack. */
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} } ,      /* Decrease master window size. */
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} } ,      /* Increase master window size. */
+	{ MODKEY,                       XK_Return, zoom,           {0} },                /* Current choosen window master. */
+	{ MODKEY,                       XK_Tab,    view,           {0} },                /* Change current choosen window to master. */
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /* Tabbed layout.    */
-	{ MODKEY|ControlMask,           XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
-	{ MODKEY|ControlMask,           XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
-	{ MODKEY,                       XK_space,  setlayout,      {0} },                /* Toggle layout. */
-	{ MODKEY|ControlMask,           XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } }, /* Toggle all tags. */
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } }, /* Move window to the next tag. */
+	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
+	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
+	{ MODKEY|ShiftMask,             XK_space,  setlayout,      {0} },                /* Toggle layout. */
+	{ MODKEY,                       XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
+	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },        /* Toggle all tags. */
+	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },        /* Move window to the next tag. */
+	/* Monitor things. */
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
@@ -165,8 +182,10 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ControlMask,           XK_q,      quit,           {0} },  /* Quit dwm. */
-	{ MODKEY|ControlMask,           XK_c,      killclient,     {0} },  /* Close current window. */
+	/* DWM hotkeys(It's rarely used, so it takes the most effort to use). */
+	{ MODKEY|ShiftMask|ControlMask,           XK_l,      spawn,          {.v lockcmd } }, /* Lock the screen. */
+	{ MODKEY|ShiftMask|ControlMask,           XK_q,      quit,           {0} },           /* Quit dwm. */
+
 };
 
 /* Button definitions. */
