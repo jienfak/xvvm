@@ -41,6 +41,7 @@ static const Rule rules[] = {
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       0,            0,           -1 },
 	{ "mpv",      NULL,       NULL,       0,            1,           -1 },
+	{ "Ardour",   NULL,       NULL,       0,            1,           -1 },
 };
 
 /* Layout(s). */
@@ -127,6 +128,11 @@ static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dic
 /* Phrases access. */
 static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
 
+/* Off the machine. */
+static const char *offcmd[] = {"shutdown", "--poweroff", "now", NULL};
+/* Rebboo the machine. */
+static const char *rebootcmd[] = {"shutdown", "--reboot", "now", NULL};
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	/* Program spawners. */
@@ -183,8 +189,10 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	/* DWM hotkeys(It's rarely used, so it takes the most effort to use). */
-	{ MODKEY|ShiftMask|ControlMask,           XK_l,      spawn,          {.v lockcmd } }, /* Lock the screen. */
-	{ MODKEY|ShiftMask|ControlMask,           XK_q,      quit,           {0} },           /* Quit dwm. */
+	{ MODKEY|ShiftMask|ControlMask,           XK_l,      spawn,          {.v = lockcmd } },  /* Lock the screen. */
+	{ MODKEY|ShiftMask|ControlMask,           XK_q,      quit,           {0} },              /* Quit dwm. */
+	{ MODKEY|ShiftMask|ControlMask,           XK_s,      spawn,          {.v = offcmd} },    /* Powefoff. */
+	{ MODKEY|ShiftMask|ControlMask,           XK_r,      spawn,          {.v = rebootcmd} }, /* Reboot. */
 
 };
 
