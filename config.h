@@ -40,8 +40,11 @@ static const Rule rules[] = {
 	/* Class      Instance    Title       Tags mask     Is floating  Monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       0,            0,           -1 },
-	{ "mpv",      NULL,       NULL,       0,            1,           -1 },
+	{ "mpv",      NULL,       NULL,       0b111111111,  1,           -1 },
 	{ "Ardour",   NULL,       NULL,       0,            1,           -1 },
+	{ "ZynAddSubFX",
+	              NULL,       NULL,       0,            1,           -1 },
+	{ "LMMS",     NULL,       NULL,       0,            1,           -1 },
 };
 
 /* Layout(s). */
