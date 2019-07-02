@@ -132,7 +132,7 @@ static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dic
 static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
 
 /* DAW. */
-static const char *dawcmd[] = {"non-session-manager"};
+static const char *dawcmd[] = {"non-session-manager", NULL};
 
 /* E-mail client. */
 static const char *emailcmd[] = SHCMD("st -e tmux new-session mutt");
@@ -158,7 +158,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = sndcmd} },    /* Sound mixer. */
 	{ MODKEY|ShiftMask,             XK_h,      spawn,          {.v = hwcmd }},     /* Hardware info. */
 	{ MODKEY|ShiftMask,             XK_c,      spawn,          {.v = irccmd }},    /* IRC chat program. */
-	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = emailcmd }},  /* E-mail client. */
+	{ MODKEY|ShiftMask,             XK_l,      spawn,          {.v = emailcmd }},  /* E-mail client. */
 
 	/* Windows stuff and input(The most needed). */
 
