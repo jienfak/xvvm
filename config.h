@@ -131,6 +131,12 @@ static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dic
 /* Phrases access. */
 static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
 
+/* DAW. */
+static const char *dawcmd[] = {"non-session-manager"};
+
+/* E-mail client. */
+static const char *emailcmd[] = SHCMD("st -e tmux new-session mutt");
+
 /* Off the machine. */
 static const char *offcmd[] = {"shutdown", "--poweroff", "now", NULL};
 /* Rebboo the machine. */
@@ -139,18 +145,20 @@ static const char *rebootcmd[] = {"shutdown", "--reboot", "now", NULL};
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	/* Program spawners. */
+	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = dawcmd} },    /* DAW. */
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
 	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal.     */
 	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* File manager. */
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Music player. */
-	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Spawn browser. */
+	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Browser. */
 	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = imgcmd} },    /* Image viewer. */
 	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd} },   /* Network control. */
 	{ MODKEY|ShiftMask,             XK_e,      spawn,          {.v = edcmd} },     /* Editor. */
 	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = sndcmd} },    /* Sound mixer. */
 	{ MODKEY|ShiftMask,             XK_h,      spawn,          {.v = hwcmd }},     /* Hardware info. */
 	{ MODKEY|ShiftMask,             XK_c,      spawn,          {.v = irccmd }},    /* IRC chat program. */
+	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = emailcmd }},  /* E-mail client. */
 
 	/* Windows stuff and input(The most needed). */
 
@@ -196,7 +204,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask|ControlMask,           XK_q,      quit,           {0} },              /* Quit dwm. */
 	{ MODKEY|ShiftMask|ControlMask,           XK_s,      spawn,          {.v = offcmd} },    /* Powefoff. */
 	{ MODKEY|ShiftMask|ControlMask,           XK_r,      spawn,          {.v = rebootcmd} }, /* Reboot. */
-
 };
 
 /* Button definitions. */
