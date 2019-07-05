@@ -114,7 +114,7 @@ static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOM
 /* DAW. */
 static const char *dawcmd[] = {"non-session-manager", NULL};
 /* Video editor. */
-static const char *vecmd[] = SHCMD("st -e sh -c 'sudo nohup cin &'");
+static const char *vecmd[] = SHCMD("st -e sudo sh -c 'nohup cin &'");
 /* E-mail client. */
 static const char *emailcmd[] = SHCMD("st -e tmux new-session mutt");
 /* Off the machine. */
