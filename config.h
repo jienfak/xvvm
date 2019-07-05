@@ -74,78 +74,58 @@ static const Layout layouts[] = {
 /* Commands. */
 static char dmenumon[2] = "0"; /* Component of dmenucmd, manipulated in spawn(). */
 static char * dmenucmd[] = { "dmenu_run", "-p", "&", "-m", dmenumon, NULL }; /* DMenu. */
-
  /*Terminal. */
-/*{ "st", "-e", "tmux", "new-session", NULL }*/ 
 static const char *termcmd[]  = SHCMD("st -e tmux new-session") ;
-
 /* File manager. */
-/*{"st", "-e", "tmux", "new-session",  "lf", NULL } */
 static const char *fmcmd[] = SHCMD("st -e tmux new-session lf"); 
-
 /* Music player. */
-/* {"st", "-e", "tmux", "new-session", "cmus", NULL} */
 static const char *mpcmd[] = SHCMD("st -e tmux new-session cmus") ; 
-
 /* Image viewer. */
 static const char *imgcmd[] = SHCMD("cd \"$(xdg-user-dir PICTURES)\" ; vimiv");
-
 /* Toggle dvorak layout.*/
 static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
-		                                      "setxkbmap -layout us,ru  -option grp:alt_space_toggle\n"
+                                              "setxkbmap -layout us,ru  -option grp:alt_space_toggle\n"
                                           "else\n"
                                               "setxkbmap -layout us,ru -variant dvorak, -option grp:alt_space_toggle\n"
                                           "fi\n"
                                     "xmodmap ~/.Xmodmap");
-static const char *ibcmd[] = SHCMD("jsurf"); /* Internet Browser. */
-/* Move mouse to choosed window. */
-static const char *mousemvcmd[] = SHCMD( "swarp $(xdotool getwindowgeometry $(xdotool getactivewindow) | grep Position | awk '{print $2}' | sed 's/,/ /')");
-
+/* Internet browser. */
+static const char *ibcmd[] = SHCMD("jsurf");
 /* Network control. */
 static const char *nctlcmd[] = SHCMD("st -e tmux new-session wicd-curses");
-
 /* Editor. */
-static const char *edcmd[] = {"gvim", NULL};
-
+static const char *edcmd[] = SHCMD("st -e sh -c 'eval $EDITOR'");
 /* Sound mixer. */
 static const char *sndcmd[] = SHCMD("st -e tmux new-session alsamixer");
-
 /* Hardware info. */
 static const char *hwcmd[] = {"hardinfo", NULL};
-
 /* IRC chat program. */
 static const char *irccmd[] = SHCMD("st -e tmux new-session weechat");
-
 /* Execute program inside of st. */
 static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|dmenu -p '!' -m $0)\\\"\"", dmenumon, NULL};
-
 /* Lock the screen. */
 static const char *lockcmd[] = SHCMD("slock");
-
 /* Path type cmd. */
 static const char *dmfilecmd[] = SHCMD("xdotool type \"$(dmenu_file)\"");
-
 /* Dictionary typing. */
 static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dict/en_words_alpha.txt)\"");
-
 /* Phrases access. */
 static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
-
 /* DAW. */
 static const char *dawcmd[] = {"non-session-manager", NULL};
-
+/* Video editor. */
+static const char *vecmd[] = SHCMD("st -e sh -c 'sudo nohup cin &'");
 /* E-mail client. */
 static const char *emailcmd[] = SHCMD("st -e tmux new-session mutt");
-
 /* Off the machine. */
 static const char *offcmd[] = {"shutdown", "--poweroff", "now", NULL};
 /* Rebboo the machine. */
 static const char *rebootcmd[] = {"shutdown", "--reboot", "now", NULL};
-
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	/* Program spawners. */
 	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = dawcmd} },    /* DAW. */
+	{ MODKEY|ShiftMask,             XK_v,      spawn,          {.v = vecmd } },    /* Video editor. */
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
 	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute. */
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal.     */
@@ -205,7 +185,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask|ControlMask,           XK_s,      spawn,          {.v = offcmd} },    /* Powefoff. */
 	{ MODKEY|ShiftMask|ControlMask,           XK_r,      spawn,          {.v = rebootcmd} }, /* Reboot. */
 };
-
 /* Button definitions. */
 /* Click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin. */
 static Button buttons[] = {
