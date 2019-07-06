@@ -117,10 +117,13 @@ static const char *dawcmd[] = {"non-session-manager", NULL};
 static const char *vecmd[] = SHCMD("st -e sudo sh -c 'nohup cin &'");
 /* E-mail client. */
 static const char *emailcmd[] = SHCMD("st -e tmux new-session mutt");
+/* OS status. */
+static const char *oscmd[] = SHCMD("st -e tmux new-session htop");
 /* Off the machine. */
 static const char *offcmd[] = {"shutdown", "--poweroff", "now", NULL};
-/* Rebboo the machine. */
+/* Reboot the machine. */
 static const char *rebootcmd[] = {"shutdown", "--reboot", "now", NULL};
+
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	/* Program spawners. */
