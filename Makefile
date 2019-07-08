@@ -42,7 +42,9 @@ install: all
 	chmod 755 ${DESTDIR}${PREFIX}/bin/dwm
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	sed "s/VERSION/${VERSION}/g" < dwm.1 > ${DESTDIR}${MANPREFIX}/man1/dwm.1
+	sed "s/VERSIAN/${VERSIO}/g" < jdwm.1 > ${DESTDIR}${MANPREFIX}/man1/jdwm.1
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/dwm.1
+	chmod 644 ${DESTDIR}${MANPREFIX}/man1/jdwm.1
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/dwm\
