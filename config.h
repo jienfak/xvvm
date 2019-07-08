@@ -66,8 +66,10 @@ static const Layout layouts[] = {
 /* Commands. */
 static char dmenumon[2] = "0"; /* Component of dmenucmd, manipulated in spawn(). */
 static char * dmenucmd[] = { "dmenu_run", "-p", "&", "-m", dmenumon, NULL }; /* DMenu. */
- /*Terminal. */
-static const char *termcmd[]  = SHCMD("st -e tmux new-session") ;
+/*Terminal. */
+static const char *termcmd[]  = SHCMD("st -e tmux new-session");
+/* Tabbed terminal. */
+static const char *tabtermcmd[] = SHCMD("tabbed -c st -w");
 /* File manager. */
 static const char *fmcmd[] = SHCMD("st -e tmux new-session lf"); 
 /* Music player. */
@@ -132,7 +134,8 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_g,      spawn,          {.v = gedcmd} },    /* Graphics editor. */
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
 	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute. */
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal.     */
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal(with tmux).     */
+	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tabtermcmd} },/* Tabbed terminal. */ 
 	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* File manager. */
 	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Music player. */
 	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Browser. */
