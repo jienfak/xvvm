@@ -109,6 +109,8 @@ static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOM
 static const char *dawcmd[] = {"non-session-manager", NULL};
 /* Jack control. */
 static const char *jackcmd[] = {"cadence", NULL};
+/* Pavucontrol. */
+static const char *pavucmd[] = {"pavucontrol", NULL} ;
 /* Video editor. */
 static const char *vecmd[] = SHCMD("st -e sudo sh -c 'nohup cin &'");
 /* Graphics editor. */
@@ -130,6 +132,7 @@ static Key keys[] = {
 	/* Program spawners. */
 	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = dawcmd} },    /* DAW. */
 	{ MODKEY|ShiftMask,             XK_j,      spawn,          {.v = jackcmd } },  /* Jack control. */
+	{ MODKEY|ShiftMask,             XK_u,      spawn,          {.v = pavucmd} },   /* Pavucontrol. */
 	{ MODKEY|ShiftMask,             XK_v,      spawn,          {.v = vecmd } },    /* Video editor. */
 	{ MODKEY|ShiftMask,             XK_g,      spawn,          {.v = gedcmd} },    /* Graphics editor. */
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
