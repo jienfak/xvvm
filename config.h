@@ -118,9 +118,9 @@ static const char *emailcmd[] = SHCMD("st -e tmux new-session -A -s 'E-mail mana
 /* OS status. */
 static const char *oscmd[] = SHCMD("st -e tmux new-session -A -s 'Sys. stats' 'htop'");
 /* Off the machine. */
-static const char *offcmd[] = {"shutdown", "--poweroff", "now", NULL};
+static const char *offcmd[] = SHCMD("shutdown --poweroff now || poweroff") ;
 /* Reboot the machine. */
-static const char *rebootcmd[] = {"shutdown", "--reboot", "now", NULL};
+static const char *rebootcmd[] = SHCMD("shutdown --reboot now || reboot") ;
 /* Help. */
 static const char *helpcmd[] = {"st", "-e", "man", "jdwm", NULL};
 
