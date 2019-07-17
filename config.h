@@ -84,7 +84,7 @@ static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
                                           "fi\n"
                                    "xmodmap $HOME/.Xmodmap");
 /* Internet browser. */
-static const char *ibcmd[] = SHCMD("jsurf");
+static const char *ibcmd[] = SHCMD("firefox");
 /* Network control. */
 static const char *nctlcmd[] = SHCMD("st -e tmux new-session -A -s 'Network control' 'wicd-curses'");
 /* Editor. */
