@@ -5,7 +5,7 @@ static const unsigned int borderpx  = 3;        /* Border pixel of windows. */
 static const unsigned int snap      = 32;       /* Snap pixel.              */
 static const int showbar            = 1;        /* 0 means no bar.          */
 static const int topbar             = 1;        /* 0 means bottom bar.      */
-static const char *fonts[]          = { "monospace:size=10" };
+static const char *fonts[]          = { "Consolas:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#333333";
@@ -84,7 +84,7 @@ static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
                                           "fi\n"
                                    "xmodmap $HOME/.Xmodmap");
 /* Internet browser. */
-static const char *ibcmd[] = SHCMD("firefox");
+static const char *ibcmd[] = SHCMD("st -e tmux new-session $BROWSER");
 /* Network control. */
 static const char *nctlcmd[] = SHCMD("st -e tmux new-session -A -s 'Network control' 'wicd-curses'");
 /* Editor. */
@@ -92,7 +92,7 @@ static const char *edcmd[] = SHCMD("st -e sh -c 'eval $EDITOR'");
 /* Sound mixer. */
 static const char *sndcmd[] = SHCMD("st -e tmux new-session -A -s 'Sound control' 'alsamixer'");
 /* Hardware info. */
-static const char *hwcmd[] = {"hardinfo", NULL};
+static const char *hwcmd[] = SHCMD("st -e sh -c \"hwinfo --all | eval $PAGER\"");
 /* IRC chat program. */
 static const char *irccmd[] = SHCMD("st -e tmux new-session -A -s 'Chat' 'weechat'");
 /* Execute program inside of st. */
@@ -111,10 +111,8 @@ static const char *dawcmd[] = {"non-session-manager", NULL};
 static const char *jackcmd[] = {"cadence", NULL};
 /* Pavucontrol. */
 static const char *pavucmd[] = {"pavucontrol", NULL} ;
-/* Video editor. */
-static const char *vecmd[] = SHCMD("st -e sudo sh -c 'nohup cin &'");
 /* Graphics editor. */
-static const char *gedcmd[] = {"gimp", NULL};
+static const char *gedcmd[] = {"inkscape", NULL};
 /* E-mail client. */
 static const char *emailcmd[] = SHCMD("st -e tmux new-session -A -s 'E-mail manager' 'mutt'");
 /* OS status. */
@@ -133,7 +131,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = dawcmd} },    /* DAW. */
 	{ MODKEY|ShiftMask,             XK_j,      spawn,          {.v = jackcmd } },  /* Jack control. */
 	{ MODKEY|ShiftMask,             XK_u,      spawn,          {.v = pavucmd} },   /* Pavucontrol. */
-	{ MODKEY|ShiftMask,             XK_v,      spawn,          {.v = vecmd } },    /* Video editor. */
 	{ MODKEY|ShiftMask,             XK_g,      spawn,          {.v = gedcmd} },    /* Graphics editor. */
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
 	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute. */
