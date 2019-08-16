@@ -123,7 +123,11 @@ static const char *offcmd[] = SHCMD("shutdown --poweroff now || poweroff") ;
 static const char *rebootcmd[] = SHCMD("shutdown --reboot now || reboot") ;
 /* Help. */
 static const char *helpcmd[] = {"st", "-e", "man", "jdwm", NULL};
-
+/* Keyboard layouts. */
+static const char *dvorakkbdcmd[] = SHCMD("setxkbmap -layout us,ru -variant dvorak, -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
+static const char *dvpkbdcmd[] =    SHCMD("setxkbmap -layout us,ru -variant dvp,    -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
+static const char *ruskbdcmd[] =    SHCMD("setxkbmap -layout ru,us -variant ,dvorak -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
+static const char *qwertykbdcmd[] = SHCMD("setxkbmap -layout us,ru                  -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
 
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
@@ -155,7 +159,11 @@ static Key keys[] = {
 	{ MODKEY,                       XK_e,      spawn,          {.v = phrcmd }},      /* Oftenly used phrases to type. */
 	{ MODKEY,                       XK_slash,  spawn,          {.v = dmfilecmd }},   /* Comfortable path input with dmenu . */
 	{ MODKEY,                       XK_w,      spawn,          {.v = dictcmd}},      /* Type word from the dictionary. */
-	{ MODKEY,                       XK_a,      spawn,          {.v = kblcmd} },      /* Toggle dvorak. */
+	{ MODKEY,                       XK_a,      spawn,          {.v = qwertykbdcmd}},/* Qwerty. */
+	{ MODKEY,                       XK_Tab,    spawn,          {.v = dvorakkbdcmd}}, /* Dvorak. */
+	{ MODKEY,                       XK_BackSpace,
+	                                           spawn,          {.v = ruskbdcmd}},    /* Russian. */
+	{ MODKEY,                       XK_Return, spawn,          {.v = dvpkbdcmd}},    /* Dvorak programmer. */
 	{ MODKEY,                       XK_c,      killclient,     {0} },                /* Close current window. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },                /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },         /* Change focus via keyboard(Next). */
@@ -166,8 +174,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },         /* Decrease size of window table stack. */
 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} } ,      /* Decrease master window size. */
 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} } ,      /* Increase master window size. */
-	{ MODKEY,                       XK_Return, zoom,           {0} },                /* Current choosen window master. */
-	{ MODKEY,                       XK_Tab,    view,           {0} },                /* Change current choosen window to master. */
+	{ MODKEY,                       XK_r,      zoom,           {0} },                /* Current choosen window master. */
+	/*{ MODKEY,                       XK_Tab,    view,           {0} },              *//* Change current choosen window to master. */
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /* Tabbed layout.    */
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
