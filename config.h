@@ -164,7 +164,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_BackSpace,
 	                                           spawn,          {.v = ruskbdcmd}},    /* Russian. */
 	{ MODKEY,                       XK_Return, spawn,          {.v = dvpkbdcmd}},    /* Dvorak programmer. */
-	{ MODKEY,                       XK_c,      killclient,     {0} },                /* Close current window. */
+	{ MODKEY,                       XK_x,      killclient,     {0} },                /* Close current window. */
 	{ MODKEY,                       XK_b,      togglebar,      {0} },                /* Toggle bar with tags and other. */
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },         /* Change focus via keyboard(Next). */
 	/*{ MODKEY,                       XK_j,      spawn,          {.v = mousemvcmd} },*/
