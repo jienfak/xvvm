@@ -70,31 +70,11 @@ static char * dmenucmd[] = { "dmenu_run", "-p", "&", "-m", dmenumon, NULL }; /* 
 static const char *termcmd[]  = SHCMD("st -e tmux new-session");
 /* Tabbed terminal. */
 static const char *tabtermcmd[] = SHCMD("tabbed -c st -w");
-/* File manager. */
 static const char *fmcmd[] = SHCMD("st -e tmux new-session lf"); 
-/* Music player. */
-static const char *mpcmd[] = SHCMD("st -e tmux new-session -A -s 'Music player' 'cmus'") ; 
-/* Image viewer. */
-static const char *imgcmd[] = SHCMD("cd \"$(xdg-user-dir PICTURES)\" ; vimiv");
-/* Toggle dvorak layout.*/
-static const char *kblcmd[]= SHCMD("if setxkbmap -print | grep dvorak ; then\n"
-                                              "setxkbmap -layout us,ru  -option grp:alt_space_toggle\n"
-                                          "else\n"
-                                              "setxkbmap -layout us,ru -variant dvorak, -option grp:alt_space_toggle\n"
-                                          "fi\n"
-                                   "xmodmap $HOME/.Xmodmap");
 /* Internet browser. */
 static const char *ibcmd[] = SHCMD("st -e tmux new-session $BROWSER");
 /* Network control. */
 static const char *nctlcmd[] = SHCMD("st -e tmux new-session -A -s 'Network control' 'wicd-curses'");
-/* Editor. */
-static const char *edcmd[] = SHCMD("st -e sh -c 'eval $EDITOR'");
-/* Sound mixer. */
-static const char *sndcmd[] = SHCMD("st -e tmux new-session -A -s 'Sound control' 'alsamixer'");
-/* Hardware info. */
-static const char *hwcmd[] = SHCMD("st -e sh -c \"hwinfo --all | eval $PAGER\"");
-/* IRC chat program. */
-static const char *irccmd[] = SHCMD("st -e tmux new-session -A -s 'Chat' 'weechat'");
 /* Execute program inside of st. */
 static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|dmenu -p '!' -m $0)\\\"\"", dmenumon, NULL};
 /* Lock the screen. */
@@ -107,16 +87,6 @@ static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dic
 static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
 /* DAW. */
 static const char *dawcmd[] = {"non-session-manager", NULL};
-/* Jack control. */
-static const char *jackcmd[] = {"cadence", NULL};
-/* Pavucontrol. */
-static const char *pavucmd[] = {"pavucontrol", NULL} ;
-/* Graphics editor. */
-static const char *gedcmd[] = {"inkscape", NULL};
-/* E-mail client. */
-static const char *emailcmd[] = SHCMD("st -e tmux new-session -A -s 'E-mail manager' 'mutt'");
-/* OS status. */
-static const char *oscmd[] = SHCMD("st -e tmux new-session -A -s 'Sys. stats' 'htop'");
 /* Off the machine. */
 static const char *offcmd[] = SHCMD("shutdown --poweroff now || poweroff") ;
 /* Reboot the machine. */
@@ -132,25 +102,10 @@ static const char *qwertykbdcmd[] = SHCMD("setxkbmap -layout us,ru              
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	/* Program spawners. */
-	{ MODKEY|ShiftMask,             XK_d,      spawn,          {.v = dawcmd} },    /* DAW. */
-	{ MODKEY|ShiftMask,             XK_j,      spawn,          {.v = jackcmd } },  /* Jack control. */
-	{ MODKEY|ShiftMask,             XK_u,      spawn,          {.v = pavucmd} },   /* Pavucontrol. */
-	{ MODKEY|ShiftMask,             XK_g,      spawn,          {.v = gedcmd} },    /* Graphics editor. */
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute. */
-	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute. */
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal(with tmux).     */
-	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tabtermcmd} },/* Tabbed terminal. */ 
-	{ MODKEY|ShiftMask,             XK_f,      spawn,          {.v = fmcmd} },     /* File manager. */
-	{ MODKEY|ShiftMask,             XK_m,      spawn,          {.v = mpcmd} },     /* Music player. */
-	{ MODKEY|ShiftMask,             XK_b,      spawn,          {.v = ibcmd} },     /* Browser. */
-	{ MODKEY|ShiftMask,             XK_i,      spawn,          {.v = imgcmd} },    /* Image viewer. */
-	{ MODKEY|ShiftMask,             XK_n,      spawn,          {.v = nctlcmd} },   /* Network control. */
-	{ MODKEY|ShiftMask,             XK_e,      spawn,          {.v = edcmd} },     /* Editor. */
-	{ MODKEY|ShiftMask,             XK_s,      spawn,          {.v = sndcmd} },    /* Sound mixer. */
-	{ MODKEY|ShiftMask,             XK_h,      spawn,          {.v = hwcmd }},     /* Hardware info. */
-	{ MODKEY|ShiftMask,             XK_c,      spawn,          {.v = irccmd }},    /* IRC chat program. */
-	{ MODKEY|ShiftMask,             XK_l,      spawn,          {.v = emailcmd }},  /* E-mail client. */
-	{ MODKEY|ShiftMask,             XK_o,      spawn,          {.v = oscmd }},     /* OS stats. */
+	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute.   */
+	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute.    */
+	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal(with tmux). */
+	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tabtermcmd} },/* Tabbed terminal.     */ 
 
 	/* Other. */
 

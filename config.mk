@@ -1,38 +1,37 @@
-# dwm version
+# Includable for c1-like makefiles.
+PROGNAME= $(notdir $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)) ))))
 VERSION = 6.2
+# Artifacts.
+TGT     = $(PROGNAME)$(EXEEXT)
+SRC     = $(wildcard *.c) $(ADDSRC)
+HDR     = $(wildcard *.h) $(ADDHDR)
+ADDSRC  =
+ADDHDR  =
+OBJ     = $(SRC:.c=.o)
+# Tarball.
+TARDIR  = $(TGT)-$(VERSION)
+TARARC  = $(TARDIR)$(TAREXT)
+TARGZARC  = $(TARARC)$(GZEXT)
 
-# Customize below to fit your system
+# Manual.
+MANSTDSECT = 1
+MANUAL  = $(TGT).$(MANSECT)
+# Directories.
+# Includes.
+INCFLAGS = -I/usr/X11R6/include -I/usr/include/freetype2
+# Dynamic/static libraries.
+LIBFLAGS = -L/usr/X11R6/include -lX11 -lfontconfig -lXft
+# CPPreprocessor.
+CPPFLAGS = -DVERSION=\"$(VERSION)\"
+# Warnings.
+WRNFLAGS =
+# Optimiziation flags.
+OPTFLAGS = -O3
+# Compilation Flags.
+DBGFLAGS = -g $(INCFLAGS) -O0         -Wall       $(CPPFLAGS) -DDBG
+CFLAGS   =    $(INCFLAGS) $(OPTFLAGS) $(WRNFLAGS) $(CPPFLAGS)
+LDFLAGS  = $(LIBFLAGS)
 
-# paths
-PREFIX = /usr/local
-MANPREFIX = ${PREFIX}/share/man
-
-X11INC = /usr/X11R6/include
-X11LIB = /usr/X11R6/lib
-
-# Xinerama, comment if you don't want it
-XINERAMALIBS  = -lXinerama
-XINERAMAFLAGS = -DXINERAMA
-
-# freetype
-FREETYPELIBS = -lfontconfig -lXft
-FREETYPEINC = /usr/include/freetype2
-# OpenBSD (uncomment)
-#FREETYPEINC = ${X11INC}/freetype2
-
-# includes and libs
-INCS = -I${X11INC} -I${FREETYPEINC}
-LIBS = -L${X11LIB} -lX11 ${XINERAMALIBS} ${FREETYPELIBS}
-
-# flags
-CPPFLAGS = -D_DEFAULT_SOURCE -D_BSD_SOURCE -D_POSIX_C_SOURCE=2 -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
-#CFLAGS   = -g -std=c99 -pedantic -Wall -O0 ${INCS} ${CPPFLAGS}
-CFLAGS   = -std=c99 -pedantic -Wall -Wno-deprecated-declarations -Os ${INCS} ${CPPFLAGS}
-LDFLAGS  = ${LIBS}
-
-# Solaris
-#CFLAGS = -fast ${INCS} -DVERSION=\"${VERSION}\"
-#LDFLAGS = ${LIBS}
-
-# compiler and linker
-CC = tcc
+# Compiler and linker.
+CC = tcc 
+LD = $(CC)
