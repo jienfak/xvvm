@@ -1369,9 +1369,7 @@ restack(Monitor *m)
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
-void
-run(void)
-{
+void run(void){
 	XEvent ev;
 	/* main event loop */
 	XSync(dpy, False);
@@ -1380,9 +1378,7 @@ run(void)
 			handler[ev.type](&ev); /* call handler */
 }
 
-void
-scan(void)
-{
+void scan(void){
 	unsigned int i, num;
 	Window d1, d2, *wins = NULL;
 	XWindowAttributes wa;
@@ -1407,9 +1403,7 @@ scan(void)
 	}
 }
 
-void
-sendmon(Client *c, Monitor *m)
-{
+void sendmon(Client *c, Monitor *m){
 	if (c->mon == m)
 		return;
 	unfocus(c, 1);
@@ -1423,18 +1417,14 @@ sendmon(Client *c, Monitor *m)
 	arrange(NULL);
 }
 
-void
-setclientstate(Client *c, long state)
-{
+void setclientstate(Client *c, long state){
 	long data[] = { state, None };
 
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
 		PropModeReplace, (unsigned char *)data, 2);
 }
 
-int
-sendevent(Client *c, Atom proto)
-{
+int sendevent(Client *c, Atom proto){
 	int n;
 	Atom *protocols;
 	int exists = 0;
@@ -1457,9 +1447,7 @@ sendevent(Client *c, Atom proto)
 	return exists;
 }
 
-void
-setfocus(Client *c)
-{
+void setfocus(Client *c){
 	if (!c->neverfocus) {
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 		XChangeProperty(dpy, root, netatom[NetActiveWindow],
@@ -1469,9 +1457,7 @@ setfocus(Client *c)
 	sendevent(c, wmatom[WMTakeFocus]);
 }
 
-void
-setfullscreen(Client *c, int fullscreen)
-{
+void setfullscreen(Client *c, int fullscreen){
 	if (fullscreen && !c->isfullscreen) {
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
@@ -1497,9 +1483,7 @@ setfullscreen(Client *c, int fullscreen)
 	}
 }
 
-void
-setlayout(const Arg *arg)
-{
+void setlayout(const Arg *arg){
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
 		selmon->sellt ^= 1;
 	if (arg && arg->v)
@@ -1512,9 +1496,7 @@ setlayout(const Arg *arg)
 }
 
 /* arg > 1.0 will set mfact absolutely */
-void
-setmfact(const Arg *arg)
-{
+void setmfact(const Arg *arg){
 	float f;
 
 	if (!arg || !selmon->lt[selmon->sellt]->arrange)
@@ -1526,8 +1508,7 @@ setmfact(const Arg *arg)
 	arrange(selmon);
 }
 
-void
-setup(void)
+void setup(void)
 {
 	int i;
 	XSetWindowAttributes wa;
@@ -1639,7 +1620,7 @@ sigchld(int unused)
 void
 spawn(const Arg *arg)
 {
-	if (arg->v == dmenucmd)
+	if (arg->v == runcmd)
 		dmenumon[0] = '0' + selmon->num;
 	if (fork() == 0) {
 		if (dpy)
@@ -1798,9 +1779,7 @@ unmapnotify(XEvent *e)
 	}
 }
 
-void
-updatebars(void)
-{
+void updatebars(void){
 	Monitor *m;
 	XSetWindowAttributes wa = {
 		.override_redirect = True,
@@ -1820,9 +1799,7 @@ updatebars(void)
 	}
 }
 
-void
-updatebarpos(Monitor *m)
-{
+void updatebarpos(Monitor *m){
 	m->wy = m->my;
 	m->wh = m->mh;
 	if (m->showbar) {
@@ -1833,9 +1810,7 @@ updatebarpos(Monitor *m)
 		m->by = -bh;
 }
 
-void
-updateclientlist()
-{
+void updateclientlist(){
 	Client *c;
 	Monitor *m;
 
@@ -1847,9 +1822,7 @@ updateclientlist()
 				(unsigned char *) &(c->win), 1);
 }
 
-int
-updategeom(void)
-{
+int updategeom(void){
 	int dirty = 0;
 
 #ifdef XINERAMA
@@ -1925,9 +1898,7 @@ updategeom(void)
 	return dirty;
 }
 
-void
-updatenumlockmask(void)
-{
+void updatenumlockmask(void){
 	unsigned int i, j;
 	XModifierKeymap *modmap;
 

@@ -2,9 +2,9 @@
 
 /* appearance */
 static const unsigned int borderpx  = 3;        /* Border pixel of windows. */
-static const unsigned int snap      = 32;       /* Snap pixel.              */
-static const int showbar            = 1;        /* 0 means no bar.          */
-static const int topbar             = 1;        /* 0 means bottom bar.      */
+static const unsigned int snap      = 32;       /* Snap pixel. */
+static const int showbar            = 1;        /* 0 means no bar.  */
+static const int topbar             = 1;        /* 0 means bottom bar. */
 static const char *fonts[]          = { "Consolas:size=10" };
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
@@ -37,6 +37,7 @@ static const Rule rules[] = {
 	{ "ZynAddSubFX",
 	              NULL,       NULL,       0,            1,           -1 },
 	{ "LMMS",     NULL,       NULL,       0,            1,           -1 },
+	{ "Yoshimi",   NULL,       NULL,       0,            1,           -1 },
 };
 
 /* Layout(s). */
@@ -46,8 +47,8 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 
 static const Layout layouts[] = {
 	/* Symbol     Arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
+	{ "[T]",      tile },    /* First entry is default. */
+	{ "[F]",      NULL },    /* No layout function means floating behavior. */
 	{ "[M]",      monocle },
 };
 
@@ -59,85 +60,51 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, /* Move current window to this tag. */\
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} }, /* Link current wiwond to this tag. */
 
+static char menumon[] = "0" ;
 /* Easier CMD assigning. */
-#define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, NULL }/*)*/
+#define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, menumon, NULL }/*)*/
 /* Helper to spawn application in terminal. */
-
-/* Commands. */
-static char dmenumon[2] = "0"; /* Component of dmenucmd, manipulated in spawn(). */
-static char * dmenucmd[] = { "dmenu_run", "-p", "&", "-m", dmenumon, NULL }; /* DMenu. */
-/*Terminal. */
-static const char *termcmd[]  = SHCMD("st -e tmux new-session");
-/* Tabbed terminal. */
-static const char *tabtermcmd[] = SHCMD("tabbed -c st -w");
-static const char *fmcmd[] = SHCMD("st -e tmux new-session lf"); 
-/* Internet browser. */
-static const char *ibcmd[] = SHCMD("st -e tmux new-session $BROWSER");
-/* Network control. */
-static const char *nctlcmd[] = SHCMD("st -e tmux new-session -A -s 'Network control' 'wicd-curses'");
-/* Execute program inside of st. */
-static const char *estcmd[] = {"sh", "-c", "st -e sh -c \"eval \\\"$(dmenu_path|dmenu -p '!' -m $0)\\\"\"", dmenumon, NULL};
-/* Lock the screen. */
-static const char *lockcmd[] = SHCMD("slock");
-/* Path type cmd. */
-static const char *dmfilecmd[] = SHCMD("xdotool type \"$(dmenu_file)\"");
-/* Dictionary typing. */
-static const char *dictcmd[] = SHCMD("xdotool type \"$(dmenu -p 'w:' <$HOME/.dict/en_words_alpha.txt)\"");
-/* Phrases access. */
-static const char *phrcmd[] = SHCMD("touch $HOME/.phrases;var=`dmenu -p p: <$HOME/.phrases`; {echo \"$var\"; cat ~/.phrases} | uniq -u >>$HOME/.phrases; xdotool type \"$var\"");
-/* DAW. */
-static const char *dawcmd[] = {"non-session-manager", NULL};
-/* Off the machine. */
-static const char *offcmd[] = SHCMD("shutdown --poweroff now || poweroff") ;
-/* Reboot the machine. */
-static const char *rebootcmd[] = SHCMD("shutdown --reboot now || reboot") ;
-/* Help. */
-static const char *helpcmd[] = {"st", "-e", "man", "jdwm", NULL};
+static char * [] = SHCMD("menu_run $0" ) ; /* Menu run. */
+/* Execute program inside of the terminal. */
+static const char *truncmd[] = SHCMD("menu_te $0") ;
+static const char *itruncmd[] = SHCMD("menu_ite $0") ;
 /* Keyboard layouts. */
-static const char *dvorakkbdcmd[] = SHCMD("setxkbmap -layout us,ru -variant dvorak, -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
-static const char *dvpkbdcmd[] =    SHCMD("setxkbmap -layout us,ru -variant dvp,    -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
-static const char *ruskbdcmd[] =    SHCMD("setxkbmap -layout ru,us -variant ,dvorak -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
-static const char *qwertykbdcmd[] = SHCMD("setxkbmap -layout us,ru                  -option grp:alt_space_toggle ; xmodmap ~/.Xmodmap") ;
+static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
+static const char *dvpkbdcmd[] =    SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
+static const char *ruskbdcmd[] =    SHCMD("setxkbmap $NATIVE_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
+static const char *qwertykbdcmd[] = SHCMD("setxkbmap $QWERTY_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
 
 static Key keys[] = {
 	/* Modifier                     Key        Function        Argument */
 	/* Program spawners. */
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = dmenucmd } }, /* Untouched execute.   */
-	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = estcmd } },   /* Terminal execute.    */
-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },  /* Terminal(with tmux). */
-	{ MODKEY|ShiftMask,             XK_t,      spawn,          {.v = tabtermcmd} },/* Tabbed terminal.     */ 
-
-	/* Other. */
-
+	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = runcmd } }, /* Untouched execute.   */
+	{ MODKEY|ShiftMask,             XK_r,      spawn,          {.v = truncmd } },   /* In terminal execute.    */
+	{ MODKEY|ShiftMask,             XK_i,       spawn,          {.v = itruncmd} },   /* In interactive terminal execute. */
 	/* Windows stuff and input(The most needed). */
-
-	{ MODKEY,                       XK_e,      spawn,          {.v = phrcmd }},      /* Oftenly used phrases to type. */
-	{ MODKEY,                       XK_slash,  spawn,          {.v = dmfilecmd }},   /* Comfortable path input with dmenu . */
-	{ MODKEY,                       XK_w,      spawn,          {.v = dictcmd}},      /* Type word from the dictionary. */
 	{ MODKEY,                       XK_a,      spawn,          {.v = qwertykbdcmd}},/* Qwerty. */
 	{ MODKEY,                       XK_Tab,    spawn,          {.v = dvorakkbdcmd}}, /* Dvorak. */
 	{ MODKEY,                       XK_BackSpace,
-	                                           spawn,          {.v = ruskbdcmd}},    /* Russian. */
-	{ MODKEY,                       XK_Return, spawn,          {.v = dvpkbdcmd}},    /* Dvorak programmer. */
-	{ MODKEY,                       XK_x,      killclient,     {0} },                /* Close current window. */
-	{ MODKEY,                       XK_b,      togglebar,      {0} },                /* Toggle bar with tags and other. */
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },         /* Change focus via keyboard(Next). */
+	                                           spawn,          {.v = ruskbdcmd}}, /* Russian. */
+	{ MODKEY,                       XK_Return, spawn,          {.v = dvpkbdcmd}}, /* Dvorak programmer. */
+	{ MODKEY,                       XK_x,      killclient,     {0} }, /* Close current window. */
+	{ MODKEY,                       XK_b,      togglebar,      {0} }, /* Toggle bar with tags and other. */
+	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } }, /* Change focus via keyboard(Next). */
 	/*{ MODKEY,                       XK_j,      spawn,          {.v = mousemvcmd} },*/
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },         /* Change focus via keyboard(Previous). */
+	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } }, /* Change focus via keyboard(Previous). */
 	/*{ MODKEY,                       XK_k,      spawn,          {.v = mousemvcmd} }, */
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },         /* Increase size of window table stack. */
-	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },         /* Decrease size of window table stack. */
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} } ,      /* Decrease master window size. */
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} } ,      /* Increase master window size. */
-	{ MODKEY,                       XK_r,      zoom,           {0} },                /* Current choosen window master. */
-	/*{ MODKEY,                       XK_Tab,    view,           {0} },              *//* Change current choosen window to master. */
+	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } }, /* Increase size of window table stack. */
+	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } }, /* Decrease size of window table stack. */
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} } ,/* Decrease master window size. */
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} } , /* Increase master window size. */
+	{ MODKEY,                       XK_r,      zoom,           {0} }, /* Current choosen window master. */
+	/*{ MODKEY,                       XK_Tab,    view,           {0} }, *//* Change current choosen window to master. */
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} }, /* Tabbed layout.    */
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, /* Floating layout.  */
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, /* Maximized layout. */
-	{ MODKEY|ShiftMask,             XK_space,  setlayout,      {0} },                /* Toggle layout. */
-	{ MODKEY,                       XK_space,  togglefloating, {0} },                /* Change between floated and unfloated statement. */
-	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },        /* Toggle all tags. */
-	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },        /* Move window to the next tag. */
+	{ MODKEY|ShiftMask,             XK_space,  setlayout,      {0} },  /* Toggle layout. */
+	{ MODKEY,                       XK_space,  togglefloating, {0} },  /* Change between floated and unfloated statement. */
+	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },  /* Toggle all tags. */
+	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },   /* Move window to the next tag. */
 	/* Monitor things. */
 	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
@@ -153,12 +120,8 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	/* DWM hotkeys(It's rarely used, so it takes the most effort to use). */
-	{ MODKEY|ShiftMask|ControlMask,           XK_h,      spawn,          {.v = helpcmd} },    /* Get help to jdwm. */
-	{ MODKEY|ShiftMask|ControlMask,           XK_l,      spawn,          {.v = lockcmd } },  /* Lock the screen. */
 	{ MODKEY|ShiftMask|ControlMask,           XK_q,      quit,           {0} },              /* Quit dwm. */
-	{ MODKEY|ShiftMask|ControlMask,           XK_s,      spawn,          {.v = offcmd} },    /* Powefoff. */
-	{ MODKEY|ShiftMask|ControlMask,           XK_r,      spawn,          {.v = rebootcmd} }, /* Reboot. */
-};
+} ;
 /* Button definitions. */
 /* Click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin. */
 static Button buttons[] = {
@@ -166,7 +129,7 @@ static Button buttons[] = {
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
-	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
+	/*{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },*/
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
 	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
@@ -174,5 +137,4 @@ static Button buttons[] = {
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
-};
-
+} ;
