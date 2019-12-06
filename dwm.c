@@ -1621,7 +1621,7 @@ void
 spawn(const Arg *arg)
 {
 	if (arg->v == runcmd)
-		dmenumon[0] = '0' + selmon->num;
+		menumon[0] = '0' + selmon->num;
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
