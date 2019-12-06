@@ -44,7 +44,7 @@
 #include "drw.h"
 #include "util.h"
 
-/* macros */
+/* Macros. */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask) & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
@@ -72,7 +72,7 @@ typedef union {
 	unsigned int ui;
 	float f;
 	const void *v;
-} Arg;
+} Arg ;
 
 typedef struct {
 	unsigned int click;
@@ -80,7 +80,7 @@ typedef struct {
 	unsigned int button;
 	void (*func)(const Arg *arg);
 	const Arg arg;
-} Button;
+} Button ;
 
 typedef struct Monitor Monitor;
 typedef struct Client Client;
@@ -97,7 +97,7 @@ struct Client {
 	Client *snext;
 	Monitor *mon;
 	Window win;
-};
+} ;
 
 typedef struct {
 	unsigned int mod;
@@ -166,6 +166,9 @@ static void drawbars(void);
 static void enternotify(XEvent *e);
 static void expose(XEvent *e);
 static void focus(Client *c);
+static void focuscurwin(const Arg *arg);
+static void raiseclient(const Arg *arg);
+static void lowerclient(const Arg *arg);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
@@ -423,7 +426,7 @@ buttonpress(XEvent *e)
 	XButtonPressedEvent *ev = &e->xbutton;
 
 	click = ClkRootWin;
-	/* focus monitor if necessary */
+	/* Focus monitor if necessary. */
 	if ((m = wintomon(ev->window)) && m != selmon) {
 		unfocus(selmon->sel, 1);
 		selmon = m;
@@ -459,7 +462,7 @@ void
 checkotherwm(void)
 {
 	xerrorxlib = XSetErrorHandler(xerrorstart);
-	/* this causes an error if some other window manager is running */
+	/* This causes an error if some other window manager is running. */
 	XSelectInput(dpy, DefaultRootWindow(dpy), SubstructureRedirectMask);
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
@@ -780,9 +783,7 @@ expose(XEvent *e)
 		drawbar(m);
 }
 
-void
-focus(Client *c)
-{
+void focus(Client *c){
 	if (!c || !ISVISIBLE(c))
 		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
 	if (selmon->sel && selmon->sel != c)
@@ -805,19 +806,15 @@ focus(Client *c)
 	drawbars();
 }
 
-/* there are some broken focus acquiring clients needing extra handling */
-void
-focusin(XEvent *e)
-{
+/* There are some broken focus acquiring clients needing extra handling. */
+void focusin(XEvent *e){
 	XFocusChangeEvent *ev = &e->xfocus;
 
 	if (selmon->sel && ev->window != selmon->sel->win)
 		setfocus(selmon->sel);
 }
 
-void
-focusmon(const Arg *arg)
-{
+void focusmon(const Arg *arg){
 	Monitor *m;
 
 	if (!mons->next)
@@ -829,27 +826,32 @@ focusmon(const Arg *arg)
 	focus(NULL);
 }
 
-void
-focusstack(const Arg *arg)
-{
-	Client *c = NULL, *i;
+void focuscurwin(const Arg *arg){
+	focus(selmon->sel);
+}
 
-	if (!selmon->sel)
-		return;
-	if (arg->i > 0) {
+void raiseclient(const Arg *arg){
+	XRaiseWindow(dpy, selmon->sel->win);
+}
+
+void lowerclient(const Arg *arg){
+	XLowerWindow(dpy, selmon->sel->win);
+}
+
+void focusstack(const Arg *arg){
+	Client *c = NULL, *i;
+	if(! selmon->sel ) return ;
+	if( arg->i > 0 ){
 		for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
 		if (!c)
 			for (c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
-	} else {
+	}else{
 		for (i = selmon->clients; i != selmon->sel; i = i->next)
 			if (ISVISIBLE(i))
 				c = i;
-		if (!c)
-			for (; i; i = i->next)
-				if (ISVISIBLE(i))
-					c = i;
+		if (!c) for (; i; i = i->next) if (ISVISIBLE(i)) c = i ;
 	}
-	if (c) {
+	if(c){
 		focus(c);
 		restack(selmon);
 	}
@@ -1014,16 +1016,14 @@ killclient(const Arg *arg)
 	}
 }
 
-void
-manage(Window w, XWindowAttributes *wa)
-{
+void manage(Window w, XWindowAttributes *wa){
 	Client *c, *t = NULL;
 	Window trans = None;
 	XWindowChanges wc;
 
 	c = ecalloc(1, sizeof(Client));
 	c->win = w;
-	/* geometry */
+	/* Geometry. */
 	c->x = c->oldx = wa->x;
 	c->y = c->oldy = wa->y;
 	c->w = c->oldw = wa->width;
@@ -1052,21 +1052,21 @@ manage(Window w, XWindowAttributes *wa)
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
-	configure(c); /* propagates border_width, if size doesn't change */
+	configure(c); /* Propagates border_width, if size doesn't change. */
 	updatewindowtype(c);
 	updatesizehints(c);
 	updatewmhints(c);
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
-	if (!c->isfloating)
-		c->isfloating = c->oldstate = trans != None || c->isfixed;
-	if (c->isfloating)
+	if (c->isfloating && autoraise)
 		XRaiseWindow(dpy, c->win);
+	else
+		c->isfloating = c->oldstate = trans != None || c->isfixed ;
 	attach(c);
 	attachstack(c);
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
 		(unsigned char *) &(c->win), 1);
-	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
+	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* Some windows require this. */
 	setclientstate(c, NormalState);
 	if (c->mon == selmon)
 		unfocus(selmon->sel, 0);
@@ -1143,7 +1143,7 @@ movemouse(const Arg *arg)
 
 	if (!(c = selmon->sel))
 		return;
-	if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
+	if (c->isfullscreen) /* No support moving fullscreen windows by mouse. */
 		return;
 	restack(selmon);
 	ocx = c->x;
@@ -1354,7 +1354,7 @@ restack(Monitor *m)
 	drawbar(m);
 	if (!m->sel)
 		return;
-	if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
+	if( m->sel->isfloating || !m->lt[m->sellt]->arrange && autoraise )
 		XRaiseWindow(dpy, m->sel->win);
 	if (m->lt[m->sellt]->arrange) {
 		wc.stack_mode = Below;
@@ -1467,7 +1467,7 @@ void setfullscreen(Client *c, int fullscreen){
 		c->bw = 0;
 		c->isfloating = 1;
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
-		XRaiseWindow(dpy, c->win);
+		if(autoraise) XRaiseWindow(dpy, c->win) ;
 	} else if (!fullscreen && c->isfullscreen){
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)0, 0);

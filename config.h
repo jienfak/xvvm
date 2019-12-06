@@ -100,7 +100,7 @@ static Key keys[] = {
 	TAGKEYS(XK_1, 0),
 	TAGKEYS(XK_2, 1),
 	TAGKEYS(XK_3, 2),
-	TAGKEYS( XK_4, 3),
+	TAGKEYS(XK_4, 3),
 	TAGKEYS(XK_5, 4),
 	TAGKEYS(XK_6, 5),
 	TAGKEYS(XK_7, 6),
@@ -116,12 +116,22 @@ static Button buttons[] = {
 	{ ClkLtSymbol, 0, Button1, setlayout, {0}},
 	{ ClkLtSymbol, 0, Button3, setlayout,  {.v = &layouts[2]}},
 	{ ClkWinTitle, 0, Button2, zoom, {0} },
+	{ ClkWinTitle, 0, Button1, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
+	{ ClkWinTitle, 0, Button3,setmfact, {.f = +0.05} } , /* Increase master window size. */
 	{ ClkStatusText, 0, Button2, spawn, {.v = termcmd } },
-	{ ClkClientWin, MODKEY, Button1, movemouse,      {0} },
-	{ ClkClientWin, MODKEY, Button2, killclient, {0}  },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
-	{ ClkTagBar,            0,              Button1,        view,           {0} },
-	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
-	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
-	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
+	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button2, killclient, {0}  },
+	{ ClkClientWin, MODKEY, Button2, focuscurwin, {0}  },
+	{ ClkClientWin, MODKEY, Button4, raiseclient, {0}  },
+	{ ClkClientWin, MODKEY, Button5, lowerclient, {0}  },
+	{ ClkClientWin, MODKEY, Button3, resizemouse,    {0} },
+	{ ClkClientWin, MODKEY|ControlMask, Button2, zoom, {0} },
+	{ ClkRootWin, 0, Button2, termcmd, {0}},
+	{ ClkTagBar, 0, Button1, view, {0} },
+	{ ClkTagBar, 0, Button3, toggleview,     {0} },
+	{ ClkTagBar, MODKEY, Button1, tag, {0} },
+	{ ClkTagBar, MODKEY, Button3, toggletag, {0} },
 } ;
+
+/* Behaviour. */
+static char autoraise = 0 ;
