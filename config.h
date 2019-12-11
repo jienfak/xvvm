@@ -58,14 +58,22 @@ static const Layout layouts[] = {
 static char menumon[] = "0" ;
 /* Easier CMD assigning. */
 #define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, menumon, NULL }/*)*/
+/* It is called on "vvm" start. */
+#define XMODMAP_MERGE "[ -r \"$XMODMAP\"] && xmodmap $XMODMAP ;"
+static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
+	XMODMAP_MERGE \
+	"xset r rate \"$KEYBOARD_REPEAT_DELAY\" \"$KEYBOARD_REPEAT_RATE\" ;" \
+	"xrdb -merge \"$XRESOURCES\"" \
+	"") ;
+
 /* Helper to spawn application in terminal. */
-static char *runcmd[] = SHCMD("menu_run $0" ) ; /* Menu run. */
-static char *termcmd[] = SHCMD("t") ; /* Terminal run. */
+static char *runcmd[] = SHCMD("exec $VVM_MENU_RUN" ) ; /* Menu run. */
+static char *termcmd[] = SHCMD("exec $VVM_TERMINAL") ; /* Terminal run. */
 /* Keyboard layouts. */
-static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
-static const char *dvpkbdcmd[] =    SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
-static const char *natkbdcmd[] =    SHCMD("setxkbmap $NATIVE_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
-static const char *qwertykbdcmd[] = SHCMD("setxkbmap $QWERTY_KEYBOARD_LAYOUT ; xmodmap $XMODMAP") ;
+static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
+static const char *dvpkbdcmd[] = SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
+static const char *natkbdcmd[] = SHCMD("setxkbmap $NATIVE_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
+static const char *qwertykbdcmd[] = SHCMD("setxkbmap $QWERTY_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
 
 static Key keys[] = {
 	/* Modifier, key, function, argument. */
