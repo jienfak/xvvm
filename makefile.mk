@@ -10,7 +10,7 @@ CLEAN     = clean_dist clean_artifacts
 .SILENT: install uninstall clean $(CLEAN)
 
 
-all : show_options strip
+all : $(TGT)
 
 dbg : set_dbgflags show_info $(CLEAN) $(TGT)
 	$(LD) $(OUTFLAG) $(TGT) $(LDFLAGS) $(OBJ)
@@ -49,8 +49,8 @@ $(TGT) : $(OBJ)
 	$(LD) $(LDFLAGS) $(OUTFLAG) $@ $(OBJ)
 
 $(MANUAL) :
-strip : $(TGT)
-	$(STRIP) $<
+strip :
+	$(STRIP) $(TGT)
 
 %.$(OBJEXT) : %.$(CEXT)
 	@$(ECHO) "[$@]"

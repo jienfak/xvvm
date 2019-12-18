@@ -59,12 +59,12 @@ static char menumon[] = "0" ;
 /* Easier CMD assigning. */
 #define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, menumon, NULL }/*)*/
 /* It is called on "vvm" start. */
-#define XMODMAP_MERGE "[ -r \"$XMODMAP\"] && xmodmap $XMODMAP ;"
+#define XMODMAP_MERGE " [ -r \"$XMODMAP\" ] && xmodmap $XMODMAP ;"
 static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
 	XMODMAP_MERGE \
 	"xset r rate \"$KEYBOARD_REPEAT_DELAY\" \"$KEYBOARD_REPEAT_RATE\" ;" \
-	"xrdb -merge \"$XRESOURCES\"" \
-	"") ;
+	"xrdb -merge \"$XRESOURCES\" ; " \
+	"eval \"$VVM_RCCMD\" ") ;
 
 /* Helper to spawn application in terminal. */
 static char *runcmd[] = SHCMD("exec $VVM_MENU_RUN" ) ; /* Menu run. */
@@ -79,22 +79,22 @@ static Key keys[] = {
 	/* Modifier, key, function, argument. */
 	/* Program spawners. */
 	{MODKEY|ShiftMask, XK_Return, spawn, {.v = termcmd}},
-	/* Windows stuff and input(The most needed). */
-	{ MODKEY, XK_a, spawn, {.v = qwertykbdcmd}},/* Qwerty. */
-	{ MODKEY, XK_Tab,    spawn, {.v = dvorakkbdcmd}}, /* Dvorak. */
-	{ MODKEY, XK_BackSpace, spawn, {.v = natkbdcmd}}, /* Alternative. */
-	{ MODKEY, XK_Return, spawn, {.v = dvpkbdcmd}}, /* Dvorak programmer. */
+	/* Clients stuff and input. (The most needed) */
+	{ MODKEY, XK_a, spawn, {.v = qwertykbdcmd} }, /* Qwerty. */
+	{ MODKEY, XK_Tab,    spawn, {.v = dvorakkbdcmd} }, /* Dvorak. */
+	{ MODKEY, XK_BackSpace, spawn, {.v = natkbdcmd} }, /* Alternative. */
+	{ MODKEY, XK_Return, spawn, {.v = dvpkbdcmd} }, /* Dvorak programmer. */
 	{ MODKEY, XK_x, killclient, {0} }, /* Close current window. */
 	{ MODKEY,  XK_b, togglebar, {0} }, /* Toggle bar with tags and other. */
 	{ MODKEY, XK_j, focusstack, {.i = +1 } }, /* Change focus via keyboard(Next). */
 	{ MODKEY, XK_k, focusstack, {.i = -1 } }, /* Change focus via keyboard(Previous). */
 	{ MODKEY, XK_i, incnmaster, {.i = +1 } }, /* Increase size of window table stack. */
 	{ MODKEY,  XK_d, incnmaster, {.i = -1 } }, /* Decrease size of window table stack. */
-	{ MODKEY, XK_h, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
-	{ MODKEY, XK_l, setmfact, {.f = +0.05} } , /* Increase master window size. */
+	{ MODKEY, XK_h, setmfact, {.f = -0.05} }, /* Decrease master window size. */
+	{ MODKEY, XK_l, setmfact, {.f = +0.05} }, /* Increase master window size. */
 	{ MODKEY, XK_r, zoom, {0} }, /* Current choosen window master. */
-	{ MODKEY, XK_t, setlayout, {.v = &layouts[0]} }, /* Tabbed layout.    */
-	{ MODKEY, XK_f, setlayout, {.v = &layouts[1]} }, /* Floating layout.  */
+	{ MODKEY, XK_t, setlayout, {.v = &layouts[0]} }, /* Tabbed layout. */
+	{ MODKEY, XK_f, setlayout, {.v = &layouts[1]} }, /* Floating layout. */
 	{ MODKEY, XK_m, setlayout, {.v = &layouts[2]} }, /* Maximized layout. */
 	{ MODKEY|ShiftMask, XK_space,  setlayout, {0} },  /* Toggle layout. */
 	{ MODKEY, XK_space,  togglefloating, {0} },  /* Change between floated and unfloated statement. */
@@ -129,17 +129,17 @@ static Button buttons[] = {
 	{ ClkStatusText, 0, Button2, spawn, {.v = termcmd } },
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	{ ClkClientWin, MODKEY|ShiftMask, Button2, killclient, {0}  },
-	{ ClkClientWin, MODKEY, Button2, focuscurwin, {0}  },
-	{ ClkClientWin, MODKEY, Button4, raiseclient, {0}  },
-	{ ClkClientWin, MODKEY, Button5, lowerclient, {0}  },
-	{ ClkClientWin, MODKEY, Button3, resizemouse,    {0} },
+	{ ClkClientWin, MODKEY, Button2, focuscurwin, {0} },
+	{ ClkClientWin, MODKEY, Button4, raiseclient, {0} },
+	{ ClkClientWin, MODKEY, Button5, lowerclient, {0} },
+	{ ClkClientWin, MODKEY, Button3, resizemouse, {0} },
 	{ ClkClientWin, MODKEY|ControlMask, Button2, zoom, {0} },
-	{ ClkRootWin, 0, Button2, termcmd, {0}},
+	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
 	{ ClkTagBar, 0, Button1, view, {0} },
-	{ ClkTagBar, 0, Button3, toggleview,     {0} },
+	{ ClkTagBar, 0, Button3, toggleview, {0} },
 	{ ClkTagBar, MODKEY, Button1, tag, {0} },
 	{ ClkTagBar, MODKEY, Button3, toggletag, {0} },
 } ;
 
 /* Behaviour. */
-static char autoraise = 0 ;
+static char autoraise = (char)0 ;
