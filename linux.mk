@@ -1,4 +1,5 @@
 # Configuration for GNU/Linux systems.
+
 # Standard programs.
 RM      = rm -rfv
 INSTALL = install -v
@@ -11,20 +12,25 @@ ECHO    = echo
 SED     = sed
 DATE    = date
 MAKE    = make
+
 # Flags.
 OUTFLAG = -o
 OBJFLAG = -c
+
 # Extensions.
 OBJEXT  = .o
 CEXT    = .c
+HEXT = .h
 GZEXT   = .gz
 TAREXT  = .tar
 EXEEXT  = 
+
 # Directories and prefixes.
 ROOTDIR       = 
 DIRPREFIX     = usr/local
 BINPREFIX     = bin
 DESTDIR       = $(ROOTDIR)/$(DIRPREFIX)
+
 # For programs with manual configuration.
 MANPREFIX     = share/man
 MANSTDSECT    = 1

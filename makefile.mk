@@ -6,7 +6,7 @@ include config.mk
 include os.mk
 include $(OS).mk
 SHOW_INFO = show_options show_artifacts show_paths
-CLEAN     = clean_dist clean_artifacts
+CLEAN     = clean_artifacts clean_dist 
 .SILENT: install uninstall clean $(CLEAN)
 
 
@@ -46,13 +46,13 @@ show_info : $(SHOW_INFO)
 
 $(TGT) : $(OBJ)
 	@$(ECHO) "[$@]"
-	$(LD) $(LDFLAGS) $(OUTFLAG) $@ $(OBJ)
+	$(LD) $(OUTFLAG) $@ $(LDFLAGS)  $(OBJ)
 
 $(MANUAL) :
 strip :
 	$(STRIP) $(TGT)
 
-%.$(OBJEXT) : %.$(CEXT)
+%$(OBJEXT) : %$(CEXT)
 	@$(ECHO) "[$@]"
 	$(CC) $(OUTFLAG) $@ $(CFLAGS) $(OBJFLAG) $<
 
