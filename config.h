@@ -67,8 +67,8 @@ static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
 	"eval \"$VVM_RCCMD\" ") ;
 
 /* Helper to spawn application in terminal. */
-static char *runcmd[] = SHCMD("exec $VVM_MENU_RUN" ) ; /* Menu run. */
-static char *termcmd[] = SHCMD("exec $VVM_TERMINAL") ; /* Terminal run. */
+static char *runcmd[] = SHCMD("eval $VVM_RUN_CMD" ) ; /* Menu run. */
+static char *termcmd[] = SHCMD("eval  $VVM_TERMINAL") ; /* Terminal run. */
 /* Keyboard layouts. */
 static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
 static const char *dvpkbdcmd[] = SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
@@ -78,7 +78,8 @@ static const char *qwertykbdcmd[] = SHCMD("setxkbmap $QWERTY_KEYBOARD_LAYOUT ;" 
 static Key keys[] = {
 	/* Modifier, key, function, argument. */
 	/* Program spawners. */
-	{MODKEY|ShiftMask, XK_Return, spawn, {.v = termcmd}},
+	{MODKEY|ShiftMask, XK_Return, spawn, {.v = termcmd} }, /* Terminal. */
+	{MODKEY|ShiftMask, XK_r, spawn, {.v = runcmd} }, /* Run CMD. (dmenu most the time) */
 	/* Clients stuff and input. (The most needed) */
 	{ MODKEY, XK_a, spawn, {.v = qwertykbdcmd} }, /* Qwerty. */
 	{ MODKEY, XK_Tab,    spawn, {.v = dvorakkbdcmd} }, /* Dvorak. */
