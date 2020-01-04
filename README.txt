@@ -1,5 +1,4 @@
-jdwm - just dwm, it's fork of dwm I use to learn coding and use CVS.
-Also I use it myself, obviously.
+vvm - dwm with new features.
 
 dwm - dynamic window manager
 ============================

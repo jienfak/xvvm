@@ -3,7 +3,7 @@
 /* Jien's config. */
 /* Appearance. */
 static const unsigned int borderpx  = 1 ; /* Border pixel of windows. */
-static const unsigned int snap = 32 ; /* Snap pixel. */
+static const unsigned int snap = 10 ; /* Snap pixel. */
 static const int showbar = 1;  /* 0 means no bar.  */
 static const int topbar = 1; /* 0 means bottom bar. */
 static const char *fonts[]  = { "Consolas:size=10" } ;
@@ -12,16 +12,17 @@ static const char col_gray1[] = "#222222" ;
 static const char col_gray2[]  = "#333333" ;
 static const char col_gray3[] = "#bbbbbb" ;
 static const char col_gray4[] = "#eeeeee" ;
+static const char col_gray[] = "#888888" ;
 static const char col_cyan[] = "#005577" ;
 static const char col_red2[] = "#FF0000" ;
 static const char col_red1[] = "#880000" ;
 static const char col_blue[] = "#0000FF" ;
 static const char col_white[] = "#FFFFFF" ;
-static const char col_black[] = "#00000" ;
+static const char col_black[] = "#000000" ;
 static const char *colors[][3] = {
 	/* Foreground, background, border. */
-	[SchemeNorm] = { col_gray3, col_gray1, col_cyan  },
-	[SchemeSel]  = { col_gray4, col_red1,  col_red2  },
+	[SchemeNorm] = { col_black, col_white, col_gray  },
+	[SchemeSel]  = { col_white, col_black,  col_white  },
 } ;
 
 /* Tagging. */
@@ -36,16 +37,16 @@ static const Rule rules[] = {
 } ;
 
 /* Layout(s). */
-static const float mfact     = 0.55; /* Factor of master area size [0.05..0.95]. */
-static const int nmaster     = 1;    /* Number of clients in master area. */
-static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals. */
+static const float mfact     = 0.55 ; /* Factor of master area size [0.05..0.95]. */
+static const int nmaster     = 1 ; /* Number of clients in master area. */
+static const int resizehints = 1 ; /* 1 means respect size hints in tiled resizals. */
 
 static const Layout layouts[] = {
-	/* Symbol     Arrange function */
-	{ "[T]",      tile },    /* First entry is default. */
-	{ "[F]",      NULL },    /* No layout function means floating behavior. */
-	{ "[M]",      monocle },
-};
+	/* Symbol, arrange function. */
+	[LayoutTile] = { "[T]",      tile }, /* First entry is default. */
+	[LayoutFloating] = { "[F]",      NULL }, /* No layout function means floating behavior. */
+	[LayoutMonocle] = { "[M]",      monocle }, /* Maximized layout. */
+} ;
 
 /* Key definitions. */
 #define MODKEY Mod4Mask
@@ -94,13 +95,13 @@ static Key keys[] = {
 	{ MODKEY, XK_h, setmfact, {.f = -0.05} }, /* Decrease master window size. */
 	{ MODKEY, XK_l, setmfact, {.f = +0.05} }, /* Increase master window size. */
 	{ MODKEY, XK_r, zoom, {0} }, /* Current choosen window master. */
-	{ MODKEY, XK_t, setlayout, {.v = &layouts[0]} }, /* Tabbed layout. */
-	{ MODKEY, XK_f, setlayout, {.v = &layouts[1]} }, /* Floating layout. */
-	{ MODKEY, XK_m, setlayout, {.v = &layouts[2]} }, /* Maximized layout. */
+	{ MODKEY, XK_t, setlayout, {.v = &layouts[LayoutTile]} }, /* Tile layout. */
+	{ MODKEY, XK_f, setlayout, {.v = &layouts[LayoutFloating]} }, /* Floating layout. */
+	{ MODKEY, XK_m, setlayout, {.v = &layouts[LayoutMonocle]} }, /* Maximized layout. */
 	{ MODKEY|ShiftMask, XK_space,  setlayout, {0} },  /* Toggle layout. */
 	{ MODKEY, XK_space,  togglefloating, {0} },  /* Change between floated and unfloated statement. */
 	{ MODKEY, XK_0, view, {.ui = ~0 } },  /* Toggle all tags. */
-	{ MODKEY|ShiftMask, XK_0, tag,  {.ui = ~0 } },   /* Move window to the next tag. */
+	{ MODKEY|ShiftMask, XK_0, tag,  {.ui = ~0 } }, /* Move window to the next tag. */
 	/* Monitor things. */
 	{ MODKEY, XK_comma,  focusmon, {.i = -1 } },
 	{ MODKEY, XK_period, focusmon, {.i = +1 } },
@@ -126,7 +127,23 @@ static Button buttons[] = {
 	{ ClkLtSymbol, 0, Button3, setlayout,  {.v = &layouts[2]}},
 	{ ClkWinTitle, 0, Button2, zoom, {0} },
 	{ ClkWinTitle, 0, Button1, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
+	{ ClkWinTitle, 0, Button5, setmfact, {.f = -0.01} },
 	{ ClkWinTitle, 0, Button3,setmfact, {.f = +0.05} } , /* Increase master window size. */
+	{ ClkWinTitle, 0, Button4, setmfact, {.f = +0.01} },
+	/* Scrolling desktop. */
+	{ ClkStatusText, 0, Button1, scrolldeskhorizontal, {.i = +300} },
+	{ ClkStatusText, 0, Button3, scrolldeskhorizontal, {.i = -300} },
+	{ ClkStatusText, 0, Button5, scrolldeskvertical, {.i = -100} },
+	{ ClkStatusText, 0, Button4, scrolldeskvertical, {.i = +100} },
+	{ ClkRootWin, MODKEY|ShiftMask, Button4, scrolldeskhorizontal, {.i = +100} },
+	{ ClkRootWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100} },
+	{ ClkRootWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100} },
+	{ ClkRootWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button4, scrolldeskhorizontal, {.i = +100} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100} },
+	{ ClkClientWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100} },
+	{ ClkClientWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
+	/* Calling terminal. */
 	{ ClkStatusText, 0, Button2, spawn, {.v = termcmd } },
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	{ ClkClientWin, MODKEY|ShiftMask, Button2, killclient, {0}  },
