@@ -72,6 +72,7 @@ static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
 /* Helper to spawn application in terminal. */
 static char *runcmd[] = SHCMD("eval $VVM_RUN_CMD" ) ; /* Menu run. */
 static char *termcmd[] = SHCMD("eval  $VVM_TERMINAL") ; /* Terminal run. */
+static char *popcmd[] = SHCMD("eval  $VVM_POP_UP_MENU") ; /* Pop up menu. */
 /* Keyboard layouts. */
 static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
 static const char *dvpkbdcmd[] = SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
@@ -132,10 +133,10 @@ static Button buttons[] = {
 	{ ClkLtSymbol, 0, Button4, nextlayout,  {.i = -1}}, /* Changing layouts by mouse wheel. */
 	{ ClkLtSymbol, 0, Button5, nextlayout,  {.i = +1}},
 	/* Master window. */
-	{ ClkWinTitle, 0, Button1, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
-	{ ClkWinTitle, 0, Button5, setmfact, {.f = -0.01} },
-	{ ClkWinTitle, 0, Button3,setmfact, {.f = +0.05} } , /* Increase master window size. */
-	{ ClkWinTitle, 0, Button4, setmfact, {.f = +0.01} },
+	{ ClkStatusText, 0, Button1, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
+	{ ClkStatusText, 0, Button5, setmfact, {.f = -0.01} },
+	{ ClkStatusText, 0, Button3,setmfact, {.f = +0.05} } , /* Increase master window size. */
+	{ ClkStatusText, 0, Button4, setmfact, {.f = +0.01} },
 	/* Scrolling desktop. */
 	{ ClkStatusText, 0, Button1, scrolldeskhorizontal, {.i = +300} },
 	{ ClkStatusText, 0, Button3, scrolldeskhorizontal, {.i = -300} },
@@ -150,7 +151,9 @@ static Button buttons[] = {
 	{ ClkClientWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100} },
 	{ ClkClientWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
 	/* Calling terminal. */
-	{ ClkStatusText, 0, Button2, spawn, {.v = termcmd } },
+	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
+	/* Calling pop up menu. */
+	{ ClkRootWin, 0, Button3, spawn, {.v = popcmd } },	
 	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	/* Close current window. */
@@ -165,7 +168,7 @@ static Button buttons[] = {
 	{ ClkClientWin, MODKEY, Button3, resizemouse, {0} },
 	/* In tiled mode choose current window as master. */
 	{ ClkClientWin, MODKEY|ControlMask, Button2, zoom, {0} },
-	{ ClkRootWin, 0, Button2, togglebar, {0} },
+	{ ClkRootWin, 0, Button1, togglebar, {0} },
 	/* Tags. */
 	{ ClkTagBar, 0, Button1, view, {0} },
 	{ ClkTagBar, 0, Button3, toggleview, {0} },
