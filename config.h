@@ -70,9 +70,9 @@ static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
 	"eval \"$VVM_RCCMD\" ") ;
 
 /* Helper to spawn application in terminal. */
-static char *runcmd[] = SHCMD("eval $VVM_RUN_CMD" ) ; /* Menu run. */
-static char *termcmd[] = SHCMD("eval  $VVM_TERMINAL") ; /* Terminal run. */
-static char *popcmd[] = SHCMD("eval  $VVM_POP_UP_MENU") ; /* Pop up menu. */
+static char *runcmd[] = SHCMD("eval \"$VVM_RUN_CMD\" " ) ; /* Menu run. */
+static char *termcmd[] = SHCMD("eval  \"$VVM_TERMINAL\" ") ; /* Terminal run. */
+static char *popcmd[] = SHCMD("eval  \"$VVM_POP_UP_MENU\" ") ; /* Pop up menu. */
 /* Keyboard layouts. */
 static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
 static const char *dvpkbdcmd[] = SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
