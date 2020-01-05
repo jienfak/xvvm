@@ -341,7 +341,7 @@ int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact){
 		if (*y + *h + 2 * c->bw < 0)
 			*y = 0;
 	}else{
-		if(m->sellt!=LayoutFloating){
+		if(m->lt[m->sellt]!=&layouts[LayoutFloating]){
 			if (*x >= m->wx + m->ww ){
 				*x = m->wx + m->ww - WIDTH(c) ;
 			}
