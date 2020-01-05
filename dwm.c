@@ -67,7 +67,7 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast } ; /* Default atoms. */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast } ; /* Clicks. */
-enum {LayoutTile, LayoutFloating, LayoutMonocle} ;
+enum {LayoutFloating, LayoutTile, LayoutMonocle} ;
 
 /* Used to define users functions behavior. */
 typedef union {
@@ -192,10 +192,12 @@ static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
-void monwinsmv(Monitor *m, int dx, int dy);
+static void monwinsmv(Monitor *m, int dx, int dy);
 static Client *nexttiled(Client *c);
+static void nextlayout(const Arg *arg);
 static void pop(Client *);
 static void propertynotify(XEvent *e);
+static void prevlayout(const Arg *arg);
 static void quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
@@ -251,7 +253,7 @@ static const char broken[] = "broken" ;
 static char stext[256];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height. */
-static int bh, blw = 0;      /* bar geometry */
+static int bh, blw = 0;      /* Bar geometry. */
 static int lrpad;            /* Sum of left and right padding for text. */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -324,7 +326,7 @@ void applyrules(Client *c){
 
 int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact){
 	int baseismin;
-	Monitor *m = c->mon;
+	Monitor *m = c->mon ;
 
 	/* Set minimum possible. */
 	*w = MAX(1, *w) ;
@@ -340,14 +342,18 @@ int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact){
 			*y = 0;
 	}else{
 		if(m->sellt!=LayoutFloating){
-			if (*x >= m->wx + m->ww )
+			if (*x >= m->wx + m->ww ){
 				*x = m->wx + m->ww - WIDTH(c) ;
-			if (*y >= m->wy + m->wh)
+			}
+			if (*y >= m->wy + m->wh){
 				*y = m->wy + m->wh - HEIGHT(c) ;
-			if (*x + *w + 2 * c->bw <= m->wx)
+			}
+			if (*x + *w + 2 * c->bw <= m->wx){
 				*x = m->wx;
-			if (*y + *h + 2 * c->bw <= m->wy)
+			}
+			if (*y + *h + 2 * c->bw <= m->wy){
 				*y = m->wy;
+			}
 		}
 	}
 	if (*h < bh){
@@ -383,10 +389,12 @@ int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact){
 		/* Restore base dimensions. */
 		*w = MAX(*w + c->basew, c->minw) ;
 		*h = MAX(*h + c->baseh, c->minh) ;
-		if (c->maxw)
+		if (c->maxw){
 			*w = MIN(*w, c->maxw) ;
-		if (c->maxh)
+		}
+		if (c->maxh){
 			*h = MIN(*h, c->maxh) ;
+		}
 	}
 	return *x != c->x || *y != c->y || *w != c->w || *h != c->h ;
 }
@@ -402,8 +410,9 @@ void arrange(Monitor *m){
 	if( m ){
 		arrangemon(m);
 		restack(m);
-	} else for (m = mons; m; m = m->next)
+	} else for (m = mons; m; m = m->next){
 		arrangemon(m);
+	}
 }
 
 void arrangemon(Monitor *m){
@@ -1061,7 +1070,7 @@ void monocle(Monitor *m){
 	if (n > 0){ /* Override layout symbol. */
 		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
 	}
-	for (c = nexttiled(m->clients); c; c = nexttiled(c->next)){
+	for (c =nexttiled(m->clients); c; c = nexttiled(c->next)){
 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
 	}
 }
@@ -1143,6 +1152,20 @@ Client *nexttiled(Client *c){
 	return c;
 }
 
+static void nextlayout(const Arg *arg){
+	Monitor *m = selmon ;
+	Arg varg;
+	int lt = ( m->lt[m->sellt] - layouts+ arg->i )   ;
+	if( lt<0 ){
+		lt = LENGTH(layouts) - 1 ;
+	}else{
+		lt %= LENGTH(layouts) ;
+	}
+	
+	varg.v = &layouts[lt] ;
+	setlayout(&varg);
+}
+
 void pop(Client *c){
 	detach(c);
 	attach(c);
@@ -1186,7 +1209,7 @@ void propertynotify(XEvent *e){
 }
 
 void quit(const Arg *arg){
-	running = 0;
+	running = 0 ;
 }
 
 Monitor *recttomon(int x, int y, int w, int h){
@@ -1423,11 +1446,14 @@ void setlayout(const Arg *arg){
 	if (arg && arg->v){
 		selmon->lt[selmon->sellt] = (Layout *)arg->v;
 	}
-	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
-	if (selmon->sel)
+	strncpy( selmon->ltsymbol,
+		selmon->lt[selmon->sellt]->symbol,
+		sizeof(selmon->ltsymbol) );
+	if (selmon->sel){
 		arrange(selmon);
-	else
+	}else{ 
 		drawbar(selmon);
+	}
 }
 
 /* arg > 1.0 will set mfact absolutely. */
@@ -1586,7 +1612,7 @@ void monwinsmv(Monitor *m, int dx, int dy){
 	int n;
 	Client *c;
 	XWindowAttributes attr;
-	if(m->sellt != LayoutFloating){ return ; }
+	if(m->lt[m->sellt] != &layouts[LayoutFloating]){ return ; }
 
 	for (c = nexttiled(m->clients); c; c = nexttiled(c->next)){
 		resize(c, c->x+dx, c->y+dy, c->w, c->h, 0);

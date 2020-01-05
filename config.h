@@ -42,9 +42,10 @@ static const int nmaster     = 1 ; /* Number of clients in master area. */
 static const int resizehints = 1 ; /* 1 means respect size hints in tiled resizals. */
 
 static const Layout layouts[] = {
+	/* Standard is ALWAYS floating. */
 	/* Symbol, arrange function. */
-	[LayoutTile] = { "[T]",      tile }, /* First entry is default. */
 	[LayoutFloating] = { "[F]",      NULL }, /* No layout function means floating behavior. */
+	[LayoutTile] = { "[T]",      tile }, /* Tiled layout. */
 	[LayoutMonocle] = { "[M]",      monocle }, /* Maximized layout. */
 } ;
 
@@ -57,8 +58,9 @@ static const Layout layouts[] = {
 	{ MODKEY|ControlMask|ShiftMask, KEY,  toggletag, {.ui = 1 << TAG} } /* Link current wiwond to this tag. */
 
 static char menumon[] = "0" ;
-/* Easier CMD assigning. */
+/* Easier CMD assigning. $1 in scripts is current monitor. */
 #define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, menumon, NULL }/*)*/
+
 /* It is called on "vvm" start. */
 #define XMODMAP_MERGE " [ -r \"$XMODMAP\" ] && xmodmap $XMODMAP ;"
 static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
@@ -107,6 +109,7 @@ static Key keys[] = {
 	{ MODKEY, XK_period, focusmon, {.i = +1 } },
 	{ MODKEY|ShiftMask, XK_comma,  tagmon, {.i = -1 } },
 	{ MODKEY|ShiftMask, XK_period, tagmon, {.i = +1 } },
+	/* Tags. */
 	TAGKEYS(XK_1, 0),
 	TAGKEYS(XK_2, 1),
 	TAGKEYS(XK_3, 2),
@@ -123,9 +126,12 @@ static Key keys[] = {
 /* Click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin. */
 static Button buttons[] = {
 	/* Click, event mask, button, function, argument. */
-	{ ClkLtSymbol, 0, Button1, setlayout, {0}},
-	{ ClkLtSymbol, 0, Button3, setlayout,  {.v = &layouts[2]}},
-	{ ClkWinTitle, 0, Button2, zoom, {0} },
+	/* Layouts. */
+	{ ClkLtSymbol, 0, Button1, setlayout, {0}}, /* Toggle layout. */
+	{ ClkLtSymbol, 0, Button3, setlayout,  {.v = &layouts[LayoutFloating]}}, /* Main layout. */
+	{ ClkLtSymbol, 0, Button4, nextlayout,  {.i = -1}}, /* Changing layouts by mouse wheel. */
+	{ ClkLtSymbol, 0, Button5, nextlayout,  {.i = +1}},
+	/* Master window. */
 	{ ClkWinTitle, 0, Button1, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
 	{ ClkWinTitle, 0, Button5, setmfact, {.f = -0.01} },
 	{ ClkWinTitle, 0, Button3,setmfact, {.f = +0.05} } , /* Increase master window size. */
@@ -145,14 +151,22 @@ static Button buttons[] = {
 	{ ClkClientWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
 	/* Calling terminal. */
 	{ ClkStatusText, 0, Button2, spawn, {.v = termcmd } },
+	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
+	/* Close current window. */
 	{ ClkClientWin, MODKEY|ShiftMask, Button2, killclient, {0}  },
+	/* Focus on window under cursor. */
 	{ ClkClientWin, MODKEY, Button2, focuscurwin, {0} },
+	/* Up window on the stack of view. */
 	{ ClkClientWin, MODKEY, Button4, raiseclient, {0} },
+	/* Low window on the stack of view. */
 	{ ClkClientWin, MODKEY, Button5, lowerclient, {0} },
+	/* Resizing by mouse. */
 	{ ClkClientWin, MODKEY, Button3, resizemouse, {0} },
+	/* In tiled mode choose current window as master. */
 	{ ClkClientWin, MODKEY|ControlMask, Button2, zoom, {0} },
-	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
+	{ ClkRootWin, 0, Button2, togglebar, {0} },
+	/* Tags. */
 	{ ClkTagBar, 0, Button1, view, {0} },
 	{ ClkTagBar, 0, Button3, toggleview, {0} },
 	{ ClkTagBar, MODKEY, Button1, tag, {0} },
