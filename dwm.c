@@ -1090,11 +1090,10 @@ void motionnotify(XEvent *e){
 }
 
 void movemouse(const Arg *arg){
-	int x, y, ocx, ocy, nx, ny;
+	int x, y, nx, ny;
 	Client *c;
 	Monitor *m;
 	XEvent ev;
-	Time lasttime = 0;
 
 	if (!(c = selmon->sel) || c->isfullscreen){ return; }
 	restack(selmon);
@@ -1104,8 +1103,6 @@ void movemouse(const Arg *arg){
 		(c->y < 0) ? 0 : c->y ,
 		c->w, c->h, 0 );
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, +1, +1);
-	ocx = c->x ;
-	ocy = c->y ;
 	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 		None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess)
 		return;
@@ -1117,29 +1114,27 @@ void movemouse(const Arg *arg){
 		case Expose:
 		case MapRequest:
 			handler[ev.type](&ev);
-			break;
+		break;
 		case MotionNotify:
-			if ((ev.xmotion.time - lasttime) <= (1000 / 60))
-				continue;
-			lasttime = ev.xmotion.time;
-
-			nx = ocx + (ev.xmotion.x - x);
-			ny = ocy + (ev.xmotion.y - y);
-			if (abs(selmon->wx - nx) < snap)
-				nx = selmon->wx;
-			else if (abs((selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap)
-				nx = selmon->wx + selmon->ww - WIDTH(c);
-			if (abs(selmon->wy - ny) < snap)
-				ny = selmon->wy;
-			else if (abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap)
-				ny = selmon->wy + selmon->wh - HEIGHT(c);
-			if ( !c->isfloating && selmon->lt[selmon->sellt]->arrange
-					&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap) )
-				togglefloating(NULL);
-
-			break;
+			/* Pass. */
+		break;
 		}
 	}while( ev.type != ButtonRelease );
+	nx = ev.xbutton.x ; ny = ev.xbutton.y ;
+	if (abs(selmon->wx - nx) < snap){
+		nx = selmon->wx ;
+	}else if(abs( (selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap ){
+		nx = selmon->wx + selmon->ww - WIDTH(c);
+	}
+	if (abs(selmon->wy - ny) < snap){
+		ny = selmon->wy;
+	}else if( abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap ){
+		ny = selmon->wy + selmon->wh - HEIGHT(c) ;
+	}
+	if ( !c->isfloating && selmon->lt[selmon->sellt]->arrange
+			&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap) ){
+		togglefloating(NULL);
+	}
 	if (!selmon->lt[selmon->sellt]->arrange || c->isfloating){
 		resize(c, nx, ny, c->w, c->h, 1);
 	}
@@ -1247,50 +1242,43 @@ void resizeclient(Client *c, int x, int y, int w, int h){
 }
 
 void resizemouse(const Arg *arg){
-	int ocx, ocy, nw, nh;
+	int nw, nh;
 	Client *c;
 	Monitor *m;
 	XEvent ev;
-	Time lasttime = 0;
 
-	if (!(c = selmon->sel))
+	if (!(c = selmon->sel) || c->isfullscreen){
 		return;
-	if (c->isfullscreen) /* No support resizing fullscreen windows by mouse. */
-		return;
+	}
 	restack(selmon);
-	ocx = c->x;
-	ocy = c->y;
-	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-			None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess){
+	if( XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+			None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess ){
 		return;
 	}
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
-		switch(ev.type) {
-		case ConfigureRequest:
-		case Expose:
-		case MapRequest:
+		switch( ev.type ){
+		case ConfigureRequest :
+		case Expose :
+		case MapRequest :
 			handler[ev.type](&ev);
-			break;
-		case MotionNotify:
-			if ((ev.xmotion.time - lasttime) <= (1000 / 60)){ continue; }
-			lasttime = ev.xmotion.time ;
-
-			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
-			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
-			if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
-					&& c->mon->wy + nh >= selmon->wy
-					&& c->mon->wy + nh <= selmon->wy + selmon->wh ){
-				if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
-						&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap)){
-					togglefloating(NULL);
-				}
-			}
-
-			break;
+		break;
+		case MotionNotify :
+			/* Pass. */
+		break;
 		}
-	} while (ev.type != ButtonRelease);
+	}while( ev.type != ButtonRelease );
+	nw = MAX(1, ev.xbutton.x - c->x ) ; nh = MAX(1, ev.xbutton.y - c->y ) ;
+	if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
+			&& c->mon->wy + nh >= selmon->wy
+			&& c->mon->wy + nh <= selmon->wy + selmon->wh ){
+		if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
+				&& (abs(nw - c->w) > snap || abs(nh - c->h) > snap)){
+			togglefloating(NULL);
+		}
+	}
+
 	if (!selmon->lt[selmon->sellt]->arrange || c->isfloating){
 		resize(c, c->x, c->y, nw, nh, 1);
 	}
