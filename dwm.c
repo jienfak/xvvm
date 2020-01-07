@@ -1099,10 +1099,10 @@ void movemouse(const Arg *arg){
 	restack(selmon);
 	/* Out of possible cursor position preventing. */
 	resize(c,
-		(c->x < 0) ? 0 : c->x  ,
-		(c->y < 0) ? 0 : c->y ,
+		(c->x + c->bw < 0) ? 0 : c->x  ,
+		(c->y + c->bw < 0) ? 0 : c->y ,
 		c->w, c->h, 0 );
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, +1, +1);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, -c->bw, -c->bw);
 	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 		None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess)
 		return;
@@ -1255,7 +1255,7 @@ void resizemouse(const Arg *arg){
 			None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess ){
 		return;
 	}
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch( ev.type ){
