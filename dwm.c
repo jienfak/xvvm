@@ -1255,7 +1255,7 @@ void resizemouse(const Arg *arg){
 			None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess ){
 		return;
 	}
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w, c->h);
+	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w - c->bw, c->h - c->bw);
 	do {
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
 		switch( ev.type ){
