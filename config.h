@@ -137,6 +137,14 @@ static Button buttons[] = {
 	{ ClkStatusText, 0, Button5, setmfact, {.f = -0.01} },
 	{ ClkStatusText, 0, Button3,setmfact, {.f = +0.05} } , /* Increase master window size. */
 	{ ClkStatusText, 0, Button4, setmfact, {.f = +0.01} },
+	{ ClkRootWin, MODKEY|ShiftMask, Button4, setmfact, {.f = +0.01} },
+	{ ClkRootWin, MODKEY|ShiftMask, Button5, setmfact, {.f = -0.01} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button4, setmfact, {.f = +0.01} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button5, setmfact, {.f = -0.01} },
+	{ ClkRootWin, MODKEY|ControlMask, Button4, setmfact, {.f = +0.05} },
+	{ ClkRootWin, MODKEY|ControlMask, Button5, setmfact, {.f = -0.05} },
+	{ ClkClientWin, MODKEY|ControlMask, Button4, setmfact, {.f = +0.05} },
+	{ ClkClientWin, MODKEY|ControlMask, Button5, setmfact, {.f = -0.05} },
 	/* Scrolling desktop. */
 	{ ClkStatusText, 0, Button1, scrolldeskhorizontal, {.i = +300} },
 	{ ClkStatusText, 0, Button3, scrolldeskhorizontal, {.i = -300} },
