@@ -173,8 +173,10 @@ static void enternotify(XEvent *e);
 static void expose(XEvent *e);
 static void focus(Client *c);
 static void focuscurwin(const Arg *arg);
-static void raiseclient(const Arg *arg);
-static void lowerclient(const Arg *arg);
+static void raiseclient(Client *c);
+static void raisefocused(const Arg *arg);
+static void lowerclient(Client *c);
+static void lowerfocused(const Arg *arg);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
@@ -815,12 +817,20 @@ void focuscurwin(const Arg *arg){
 	focus(selmon->sel);
 }
 
-void raiseclient(const Arg *arg){
-	XRaiseWindow(dpy, selmon->sel->win);
+void raiseclient(Client *c){
+	XRaiseWindow(dpy, c->win);
 }
 
-void lowerclient(const Arg *arg){
-	XLowerWindow(dpy, selmon->sel->win);
+void raisefocused(const Arg *arg){
+	raiseclient(selmon->sel);
+}
+
+void lowerclient(Client *c){
+	XLowerWindow(dpy, c->win);
+}
+
+void lowerfocused(const Arg *arg){
+	lowerclient(selmon->sel);
 }
 
 void focusstack(const Arg *arg){
@@ -1023,10 +1033,11 @@ void manage(Window w, XWindowAttributes *wa){
 	updatewmhints(c);
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
-	if (c->isfloating && autoraise)
-		XRaiseWindow(dpy, c->win);
-	else
+	if( c->isfloating ){
+		raiseclient(c);
+	}else{
 		c->isfloating = c->oldstate = trans != None || c->isfixed ;
+	}
 	attach(c);
 	attachstack(c);
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
@@ -1300,8 +1311,10 @@ void restack(Monitor *m){
 	drawbar(m);
 	if (!m->sel)
 		return;
-	if( m->sel->isfloating || !m->lt[m->sellt]->arrange && autoraise )
-		XRaiseWindow(dpy, m->sel->win);
+	if( (m->sel->isfloating || !m->lt[m->sellt]->arrange)
+			&& m->lt[m->sellt] != &layouts[LayoutFloating] ){
+		raiseclient(m->sel);
+	}
 	if( m->lt[m->sellt]->arrange ){
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
@@ -1418,7 +1431,7 @@ void setfullscreen(Client *c, int fullscreen){
 		c->bw = 0;
 		c->isfloating = 1;
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
-		if(autoraise) XRaiseWindow(dpy, c->win) ;
+		raiseclient(c);
 	} else if (!fullscreen && c->isfullscreen){
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)0, 0);
@@ -1446,7 +1459,7 @@ void setlayout(const Arg *arg){
 		sizeof(selmon->ltsymbol) );
 	if (selmon->sel){
 		arrange(selmon);
-	}else{ 
+	}else{
 		drawbar(selmon);
 	}
 }
@@ -1612,7 +1625,7 @@ void monwinsmv(Monitor *m, int dx, int dy){
 	for (c = nexttiled(m->clients); c; c = nexttiled(c->next)){
 		resize(c, c->x+dx, c->y+dy, c->w, c->h, 0);
 	}
-	
+	XRaiseWindow(dpy, m->barwin);
 }
 
 void tile(Monitor *m){

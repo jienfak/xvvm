@@ -169,9 +169,9 @@ static Button buttons[] = {
 	/* Focus on window under cursor. */
 	{ ClkClientWin, MODKEY, Button2, focuscurwin, {0} },
 	/* Up window on the stack of view. */
-	{ ClkClientWin, MODKEY, Button4, raiseclient, {0} },
+	{ ClkClientWin, MODKEY, Button4, raisefocused, {0} },
 	/* Low window on the stack of view. */
-	{ ClkClientWin, MODKEY, Button5, lowerclient, {0} },
+	{ ClkClientWin, MODKEY, Button5, lowerfocused, {0} },
 	/* Resizing by mouse. */
 	{ ClkClientWin, MODKEY, Button3, resizemouse, {0} },
 	/* In tiled mode choose current window as master. */
