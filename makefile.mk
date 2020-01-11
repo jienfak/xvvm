@@ -2,13 +2,11 @@
 .PHONY: all dbg clean install uninstall show_info  \
             show_options show_artifacts show_paths
 
-include config.mk
-include os.mk
-include $(OS).mk
+include make/config.mk
+include make/os.mk
+include make/$(OS).mk
 SHOW_INFO = show_options show_artifacts show_paths
 CLEAN     = clean_artifacts clean_dist 
-.SILENT: install uninstall clean $(CLEAN)
-
 
 all : $(TGT)
 
@@ -74,4 +72,4 @@ uninstall :
 	$(RM) $(DESTDIR)/$(BINPREFIX)/$(TGT)
 	$(RM) $(DESTDIR)/$(MANPREFIX)/$(MANSECTPREFIX)/$(MANUAL)
 
-include tarball.mk
+include make/tarball.mk

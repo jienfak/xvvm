@@ -1,13 +1,13 @@
 # Configuration for GNU/Linux systems.
 
 # Standard programs.
-RM      = rm -rfv
-INSTALL = install -v
-TAR     = tar -vcf
-GZIP    = gzip -vf
-MKDIR   = mkdir -pv
-CP      = cp -vR
-STRIP   = strip -v
+RM      = rm -rf
+INSTALL = install
+TAR     = tar -cf
+GZIP    = gzip -f
+MKDIR   = mkdir -p
+CP      = cp -R
+STRIP   = strip
 ECHO    = echo
 SED     = sed
 DATE    = date
