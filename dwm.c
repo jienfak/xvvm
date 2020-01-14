@@ -57,7 +57,7 @@
 #define HEIGHT(X) ((X)->h + 2 * (X)->bw)
 #define TAGMASK ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X) (drw_fontset_getwidth(drw, (X)) + lrpad)
-
+#define SIZEL(X) (sizeof((X)[0]))
 /* Enums. */
 enum { CurNormal, CurResize, CurMove, CurLast } ; /* Cursor */
 enum { SchemeNorm, SchemeSel } ; /* Color schemes. */
@@ -194,6 +194,7 @@ static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
+static void moveclick(const Arg *arg);
 static void monwinsmv(Monitor *m, int dx, int dy);
 static Client *nexttiled(Client *c);
 static void nextlayout(const Arg *arg);
@@ -205,6 +206,7 @@ static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
+static void resizeclick(const Arg *arg);
 static void restack(Monitor *m);
 static void run(void);
 static void scan(void);
@@ -245,6 +247,7 @@ static void updatewmhints(Client *c);
 static void view(const Arg *arg);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
+static XEvent *mousewaituntilevent(int type);
 static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
@@ -1103,56 +1106,51 @@ void motionnotify(XEvent *e){
 void movemouse(const Arg *arg){
 	int x, y, nx, ny;
 	Client *c;
-	Monitor *m;
-	XEvent ev;
+	Monitor *m = selmon ;
+	XEvent *ev;
 
-	if (!(c = selmon->sel) || c->isfullscreen){ return; }
-	restack(selmon);
+	if (!(c = m->sel) || c->isfullscreen){ return; }
+	restack(m);
 	/* Out of possible cursor position preventing. */
 	if( c->x>0 && c-y>0 ){
 		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, -c->bw, -c->bw);
 	}
-	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-		None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess)
+	if( XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
+				None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess){
 		return;
+	}
 	if (!getrootptr(&x, &y)){ return; }
-	do {
-		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
-		switch(ev.type) {
-		case ConfigureRequest:
-		case Expose:
-		case MapRequest:
-			handler[ev.type](&ev);
-		break;
-		case MotionNotify:
-			/* Pass. */
-		break;
-		}
-	}while( ev.type != ButtonRelease );
-	nx = ev.xbutton.x ; ny = ev.xbutton.y ;
-	if (abs(selmon->wx - nx) < snap){
-		nx = selmon->wx ;
-	}else if(abs( (selmon->wx + selmon->ww) - (nx + WIDTH(c))) < snap ){
-		nx = selmon->wx + selmon->ww - WIDTH(c);
+	ev = mousewaituntilevent(ButtonRelease) ;
+	nx = ev->xbutton.x ; ny = ev->xbutton.y ;
+	free(ev);
+	if (abs(m->wx - nx) < snap){
+		nx = m->wx ;
+	}else if(abs( (m->wx + m->ww) - (nx + WIDTH(c))) < snap ){
+		nx = m->wx + m->ww - WIDTH(c) ;
 	}
-	if (abs(selmon->wy - ny) < snap){
-		ny = selmon->wy;
-	}else if( abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap ){
-		ny = selmon->wy + selmon->wh - HEIGHT(c) ;
+	if (abs(m->wy - ny) < snap){
+		ny = m->wy;
+	}else if( abs((m->wy + m->wh) - (ny + HEIGHT(c))) < snap ){
+		ny = m->wy + m->wh - HEIGHT(c) ;
 	}
-	if ( !c->isfloating && selmon->lt[selmon->sellt]->arrange
+	if ( !c->isfloating && m->lt[m->sellt]->arrange
 			&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap) ){
 		togglefloating(NULL);
 	}
-	if (!selmon->lt[selmon->sellt]->arrange || c->isfloating){
+	if (!m->lt[m->sellt]->arrange || c->isfloating){
 		resize(c, nx, ny, c->w, c->h, 1);
 	}
 	XUngrabPointer(dpy, CurrentTime);
-	if( (m = recttomon(c->x, c->y, c->w, c->h)) != selmon ){
-		sendmon(c, m);
-		selmon = m;
-		focus(NULL);
+}
+
+void moveclick(const Arg *arg){
+	int x, y;
+	XEvent *ev;
+	if( !getrootptr(&x, &y) ){
+		return;
 	}
+	movemouse(NULL);
+	XWarpPointer(dpy, None, root, 0, 0, 0, 0, x, y);
 }
 
 Client *nexttiled(Client *c){
@@ -1254,7 +1252,7 @@ void resizemouse(const Arg *arg){
 	int nw, nh;
 	Client *c;
 	Monitor *m;
-	XEvent ev;
+	XEvent *ev;
 
 	if (!(c = selmon->sel) || c->isfullscreen){
 		return;
@@ -1265,20 +1263,8 @@ void resizemouse(const Arg *arg){
 		return;
 	}
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w - c->bw, c->h - c->bw);
-	do {
-		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, &ev);
-		switch( ev.type ){
-		case ConfigureRequest :
-		case Expose :
-		case MapRequest :
-			handler[ev.type](&ev);
-		break;
-		case MotionNotify :
-			/* Pass. */
-		break;
-		}
-	}while( ev.type != ButtonRelease );
-	nw = MAX(1, ev.xbutton.x - c->x ) ; nh = MAX(1, ev.xbutton.y - c->y ) ;
+	ev = mousewaituntilevent(ButtonRelease) ;
+	nw = MAX(1, ev->xbutton.x - c->x ) ; nh = MAX(1, ev->xbutton.y - c->y ) ;
 	if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
 			&& c->mon->wy + nh >= selmon->wy
 			&& c->mon->wy + nh <= selmon->wy + selmon->wh ){
@@ -1293,12 +1279,22 @@ void resizemouse(const Arg *arg){
 	}
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
-	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+	while (XCheckMaskEvent(dpy, EnterWindowMask, ev));
 	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
 		sendmon(c, m);
 		selmon = m;
 		focus(NULL);
 	}
+	free(ev);
+}
+
+void resizeclick(const Arg *arg){
+	int x, y;
+	if( !getrootptr(&x, &y) ){
+		return;
+	}
+	resizemouse(NULL);
+	XWarpPointer(dpy, None, root, 0, 0, 0, 0, x, y);
 }
 
 void restack(Monitor *m){
@@ -2007,6 +2003,24 @@ Monitor *wintomon(Window w){
 	if ((c = wintoclient(w)))
 		return c->mon;
 	return selmon ;
+}
+
+XEvent *mousewaituntilevent(int type){
+	XEvent *ev = malloc(SIZEL(ev)) ;
+	do{
+		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, ev);
+		switch( ev->type ){
+		case ConfigureRequest :
+		case Expose :
+		case MapRequest :
+			handler[ev->type](ev);
+		break;
+		case MotionNotify:
+			/* Pass. */
+		break;
+		}
+	}while( ev->type != type );
+	return ev ;
 }
 
 /* There's no way to check accesses to destroyed windows, thus those cases are

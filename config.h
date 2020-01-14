@@ -132,6 +132,7 @@ static Button buttons[] = {
 	{ ClkLtSymbol, 0, Button3, setlayout,  {.v = &layouts[LayoutFloating]}}, /* Main layout. */
 	{ ClkLtSymbol, 0, Button4, nextlayout,  {.i = -1}}, /* Changing layouts by mouse wheel. */
 	{ ClkLtSymbol, 0, Button5, nextlayout,  {.i = +1}},
+	{ ClkLtSymbol, 0, Button2,   togglefloating, {0} }, /* Toggle floating layout on current window. */
 	/* Master window. */
 	{ ClkStatusText, 0, Button1, setmfact, {.f = -0.05} } ,/* Decrease master window size. */
 	{ ClkStatusText, 0, Button5, setmfact, {.f = -0.01} },
@@ -158,14 +159,19 @@ static Button buttons[] = {
 	{ ClkClientWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100} },
 	{ ClkClientWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100} },
 	{ ClkClientWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
+	/* Changing focus. */
+	{ ClkWinTitle, 0, Button4, focusstack, {.i = +1 } }, 
+	{ ClkWinTitle, 0, Button5, focusstack, {.i = -1 } }, 
 	/* Calling terminal. */
 	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
 	/* Calling pop up menu. */
 	{ ClkRootWin, 0, Button3, spawn, {.v = popcmd } },	
 	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
+	{ ClkWinTitle, 0, Button1, moveclick, {0} },
 	/* Close current window. */
 	{ ClkClientWin, MODKEY|ShiftMask, Button2, killclient, {0}  },
+	{ ClkWinTitle, 0, Button2, killclient, {0}  },
 	/* Focus on window under cursor. */
 	{ ClkClientWin, MODKEY, Button2, focuscurwin, {0} },
 	/* Up window on the stack of view. */
@@ -174,6 +180,7 @@ static Button buttons[] = {
 	{ ClkClientWin, MODKEY, Button5, lowerfocused, {0} },
 	/* Resizing by mouse. */
 	{ ClkClientWin, MODKEY, Button3, resizemouse, {0} },
+	{ ClkWinTitle, 0, Button3, resizeclick, {0} },
 	/* In tiled mode choose current window as master. */
 	{ ClkClientWin, MODKEY|ControlMask, Button2, zoom, {0} },
 	{ ClkRootWin, 0, Button1, togglebar, {0} },
