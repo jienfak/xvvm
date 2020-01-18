@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -58,6 +59,7 @@
 #define TAGMASK ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X) (drw_fontset_getwidth(drw, (X)) + lrpad)
 #define SIZEL(X) (sizeof((X)[0]))
+#define MASK(X) (1>>(X))
 /* Enums. */
 enum { CurNormal, CurResize, CurMove, CurLast } ; /* Cursor */
 enum { SchemeNorm, SchemeSel } ; /* Color schemes. */
@@ -68,11 +70,13 @@ enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast } ; /* Default atoms.
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast } ; /* Clicks. */
 enum {LayoutFloating, LayoutTile, LayoutMonocle} ;
+enum {SideNo, SideRight, SideLeft, SideUp, SideDown} ;
 
 /* Used to define users functions behavior. */
-typedef union {
+typedef struct {
 	int i;
 	unsigned int ui;
+	bool b;
 	float f;
 	const void *v;
 } Arg ;
@@ -110,6 +114,12 @@ typedef struct {
 	void (*func)(const Arg *);
 	const Arg arg;
 } Key ;
+
+typedef struct {
+	int side;
+	void (*func)(const Arg *);
+	const Arg arg;
+} Side ;
 
 /* Structure defining function and string for layouts. */
 typedef struct {
@@ -195,7 +205,7 @@ static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static void moveclick(const Arg *arg);
-static void monwinsmv(Monitor *m, int dx, int dy);
+static void monwinsmove(Monitor *m, int dx, int dy);
 static Client *nexttiled(Client *c);
 static void nextlayout(const Arg *arg);
 static void pop(Client *);
@@ -222,6 +232,7 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
+void scrolldesk(Monitor *m, int dx, int dy, bool mvptr);
 void scrolldeskhorizontal(const Arg *arg);
 void scrolldeskvertical(const Arg *arg);
 static void tag(const Arg *arg);
@@ -1091,6 +1102,7 @@ void monocle(Monitor *m){
 
 void motionnotify(XEvent *e){
 	static Monitor *mon = NULL;
+	int i, x, y, side;
 	Monitor *m;
 	XMotionEvent *ev = &e->xmotion;
 
@@ -1100,7 +1112,32 @@ void motionnotify(XEvent *e){
 		selmon = m ;
 		focus(NULL);
 	}
-	mon = m;
+	mon = m ;
+
+	side = 0 ;
+	if( !getrootptr(&x, &y) ){ return; }
+
+	if(x==sw-1){
+		side |= 1<<SideRight ;
+	}else if(!x){
+		side |= 1<<SideLeft ;
+	}
+	
+	if(y==sh-1){
+		side |= 1<<SideDown ;
+	}else if(!y){
+		side |= 1<<SideUp ;
+	}
+
+	if(!side){
+		side |= 1<<SideNo ;
+	}
+
+	for( i = 0 ; i<LENGTH(sides) ; ++i ){
+		if (side & (1<<sides[i].side) ){
+			sides[i].func(&(sides[i].arg));
+		}
+	}
 }
 
 void movemouse(const Arg *arg){
@@ -1574,11 +1611,13 @@ void sigchld(int unused){
 }
 
 void spawn(const Arg *arg){
-	if (arg->v == runcmd)
-		menumon[0] = '0' + selmon->num;
-	if (fork() == 0) {
-		if (dpy)
+	if( arg->v == runcmd ){
+		menumon[0] = '0' + selmon->num ;
+	}
+	if( fork() == 0 ){
+		if(dpy){
 			close(ConnectionNumber(dpy));
+		}
 		setsid();
 		execvp(((char **)arg->v)[0], (char **)arg->v);
 		fprintf(stderr, "vvm: execvp %s", ((char **)arg->v)[0]);
@@ -1595,31 +1634,39 @@ void tag(const Arg *arg){
 	}
 }
 
-void tagmon(const Arg *arg)
-{
+void tagmon(const Arg *arg){
 	if (!selmon->sel || !mons->next)
 		return;
 	sendmon(selmon->sel, dirtomon(arg->i));
 }
 
+void scrolldesk(Monitor *m, int dx, int dy, bool warpptr){
+	int x, y;
+	if(m->lt[m->sellt] != &layouts[LayoutFloating]){ return ; }
+	if( warpptr ){
+		/* Move pointer with windows. */
+		if(m->showbar || !getrootptr(&x, &y)){ return; }
+		monwinsmove(m, dx, dy);
+		XWarpPointer(dpy, None, root, 0, 0, 0, 0, x+dx, y+dy);
+	}else{
+		monwinsmove(m, dx, dy);
+		XRaiseWindow(dpy, m->barwin);
+	}
+}
+
 void scrolldeskvertical(const Arg *arg){
-	monwinsmv(selmon, 0, arg->i);
+	scrolldesk(selmon, 0, arg->i, arg->b);
 }
 
 void scrolldeskhorizontal(const Arg *arg){
-	monwinsmv(selmon, arg->i, 0);
+	scrolldesk(selmon, arg->i, 0, arg->b);
 }
 
-void monwinsmv(Monitor *m, int dx, int dy){
-	int n;
+void monwinsmove(Monitor *m, int dx, int dy){
 	Client *c;
-	XWindowAttributes attr;
-	if(m->lt[m->sellt] != &layouts[LayoutFloating]){ return ; }
-
 	for (c = nexttiled(m->clients); c; c = nexttiled(c->next)){
 		resize(c, c->x+dx, c->y+dy, c->w, c->h, 0);
 	}
-	XRaiseWindow(dpy, m->barwin);
 }
 
 void tile(Monitor *m){
@@ -2010,13 +2057,11 @@ XEvent *mousewaituntilevent(int type){
 	do{
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, ev);
 		switch( ev->type ){
+		case MotionNotify:
 		case ConfigureRequest :
 		case Expose :
 		case MapRequest :
 			handler[ev->type](ev);
-		break;
-		case MotionNotify:
-			/* Pass. */
 		break;
 		}
 	}while( ev->type != type );

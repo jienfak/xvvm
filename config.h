@@ -147,25 +147,25 @@ static Button buttons[] = {
 	{ ClkClientWin, MODKEY|ControlMask, Button4, setmfact, {.f = +0.05} },
 	{ ClkClientWin, MODKEY|ControlMask, Button5, setmfact, {.f = -0.05} },
 	/* Scrolling desktop. */
-	{ ClkStatusText, 0, Button1, scrolldeskhorizontal, {.i = +300} },
-	{ ClkStatusText, 0, Button3, scrolldeskhorizontal, {.i = -300} },
-	{ ClkStatusText, 0, Button5, scrolldeskvertical, {.i = -100} },
-	{ ClkStatusText, 0, Button4, scrolldeskvertical, {.i = +100} },
-	{ ClkRootWin, MODKEY|ShiftMask, Button4, scrolldeskhorizontal, {.i = +100} },
-	{ ClkRootWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100} },
-	{ ClkRootWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100} },
-	{ ClkRootWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
-	{ ClkClientWin, MODKEY|ShiftMask, Button4, scrolldeskhorizontal, {.i = +100} },
-	{ ClkClientWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100} },
-	{ ClkClientWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100} },
-	{ ClkClientWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100} },
+	{ ClkStatusText, 0, Button1, scrolldeskhorizontal, {.i = +300, .b = false} },
+	{ ClkStatusText, 0, Button3, scrolldeskhorizontal, {.i = -300, .b = false} },
+	{ ClkStatusText, 0, Button5, scrolldeskvertical, {.i = -100, .b = false} },
+	{ ClkStatusText, 0, Button4, scrolldeskvertical, {.i = +100, .b = false} },
+	{ ClkRootWin, MODKEY|ShiftMask, Button4, scrolldeskhorizontal, {.i = +100, .b = false} },
+	{ ClkRootWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100, .b = false} },
+	{ ClkRootWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100, .b = false} },
+	{ ClkRootWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100, .b = false} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button4, scrolldeskhorizontal, {.i = +100, .b = false} },
+	{ ClkClientWin, MODKEY|ShiftMask, Button5, scrolldeskhorizontal, {.i = -100, .b = false} },
+	{ ClkClientWin, MODKEY|ControlMask, Button5, scrolldeskvertical, {.i = -100, .b = false} },
+	{ ClkClientWin, MODKEY|ControlMask, Button4, scrolldeskvertical, {.i = +100, .b = false} },
 	/* Changing focus. */
 	{ ClkWinTitle, 0, Button4, focusstack, {.i = +1 } }, 
 	{ ClkWinTitle, 0, Button5, focusstack, {.i = -1 } }, 
 	/* Calling terminal. */
 	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
 	/* Calling pop up menu. */
-	{ ClkRootWin, 0, Button3, spawn, {.v = popcmd } },	
+	{ ClkRootWin, 0, Button3, spawn, {.v = popcmd } },
 	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	{ ClkWinTitle, 0, Button1, moveclick, {0} },
@@ -190,6 +190,13 @@ static Button buttons[] = {
 	{ ClkTagBar, MODKEY, Button1, tag, {0} },
 	{ ClkTagBar, MODKEY, Button3, toggletag, {0} },
 } ;
-
+/* Sides definition. Calls functions when touches borders of screens. */
+/* Sides can be SideNo, SideRight, SideLeft, SideUp, SideDown. */
+static Side sides[] = {
+	{SideRight, scrolldeskhorizontal, {.i = -500, .b = true} },
+	{SideLeft, scrolldeskhorizontal, {.i = +500, .b = true} },
+	{SideUp, scrolldeskvertical, {.i = +500, .b = true} },
+	{SideDown, scrolldeskvertical, {.i = -500, .b = true} },
+} ;
 /* Behaviour. */
 static char autoraise = (char)0 ;
