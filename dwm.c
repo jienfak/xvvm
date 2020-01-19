@@ -1124,7 +1124,7 @@ void movemouse(const Arg *arg){
 	if (!(c = m->sel) || c->isfullscreen){ return; }
 	restack(m);
 	/* Out of possible cursor position preventing. */
-	if( c->x>0 && c-y>0 ){
+	if( c->x>0 && c->y>0 ){
 		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, -c->bw, -c->bw);
 	}
 	if( XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
@@ -1274,7 +1274,11 @@ void resizemouse(const Arg *arg){
 			None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess ){
 		return;
 	}
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w - c->bw, c->h - c->bw);
+	if( c->x+c->w < sw && c->y+c->h < sh ){
+		XWarpPointer(dpy, None, c->win,
+			0, 0, 0, 0,
+			c->w - c->bw, c->h - c->bw);
+	}
 	ev = mousewaituntilevent(ButtonRelease) ;
 	nw = MAX(1, ev->xbutton.x - c->x ) ; nh = MAX(1, ev->xbutton.y - c->y ) ;
 	if (c->mon->wx + nw >= selmon->wx && c->mon->wx + nw <= selmon->wx + selmon->ww
