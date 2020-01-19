@@ -97,6 +97,11 @@ static Key keys[] = {
 	{ MODKEY,  XK_d, incnmaster, {.i = -1 } }, /* Decrease size of window table stack. */
 	{ MODKEY, XK_h, setmfact, {.f = -0.05} }, /* Decrease master window size. */
 	{ MODKEY, XK_l, setmfact, {.f = +0.05} }, /* Increase master window size. */
+
+	{ MODKEY|ControlMask, XK_h, scrolldeskhorizontal, {.i = +300, .b = false} }, /* Scrolling desktop. */
+	{ MODKEY|ControlMask, XK_l, scrolldeskhorizontal, {.i = -300, .b = false} },
+	{ MODKEY|ControlMask, XK_k, scrolldeskvertical, {.i = +300, .b = false} },
+	{ MODKEY|ControlMask, XK_j, scrolldeskvertical, {.i = -300, .b = false} },
 	{ MODKEY, XK_r, zoom, {0} }, /* Current choosen window master. */
 	{ MODKEY, XK_t, setlayout, {.v = &layouts[LayoutTile]} }, /* Tile layout. */
 	{ MODKEY, XK_f, setlayout, {.v = &layouts[LayoutFloating]} }, /* Floating layout. */
@@ -190,7 +195,7 @@ static Button buttons[] = {
 	{ ClkTagBar, MODKEY, Button1, tag, {0} },
 	{ ClkTagBar, MODKEY, Button3, toggletag, {0} },
 } ;
-/* Sides definition. Calls functions when touches borders of screens. */
+/* Sides definition. Calls functions when touches borders of screens resizing or moving windows. */
 /* Sides can be SideNo, SideRight, SideLeft, SideUp, SideDown. */
 static Side sides[] = {
 	{SideRight, scrolldeskhorizontal, {.i = -500, .b = true} },
