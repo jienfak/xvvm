@@ -232,9 +232,10 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void sigchld(int unused);
 static void spawn(const Arg *arg);
-void scrolldesk(Monitor *m, int dx, int dy, bool mvptr);
-void scrolldeskhorizontal(const Arg *arg);
-void scrolldeskvertical(const Arg *arg);
+static void scrolldesk(Monitor *m, int dx, int dy, bool mvptr);
+static void scrolldeskhorizontal(const Arg *arg);
+static void scrolldeskvertical(const Arg *arg);
+static void sidehandle(void);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *);
@@ -1102,42 +1103,17 @@ void monocle(Monitor *m){
 
 void motionnotify(XEvent *e){
 	static Monitor *mon = NULL;
-	int i, x, y, side;
 	Monitor *m;
 	XMotionEvent *ev = &e->xmotion;
 
-	if (ev->window != root){ return; }
+	if( ev->window != root ){ return; }
 	if ((m = recttomon(ev->x_root, ev->y_root, 1, 1)) != mon && mon) {
 		unfocus(selmon->sel, 1);
 		selmon = m ;
 		focus(NULL);
 	}
 	mon = m ;
-
-	side = 0 ;
-	if( !getrootptr(&x, &y) ){ return; }
-
-	if(x==sw-1){
-		side |= 1<<SideRight ;
-	}else if(!x){
-		side |= 1<<SideLeft ;
-	}
-	
-	if(y==sh-1){
-		side |= 1<<SideDown ;
-	}else if(!y){
-		side |= 1<<SideUp ;
-	}
-
-	if(!side){
-		side |= 1<<SideNo ;
-	}
-
-	for( i = 0 ; i<LENGTH(sides) ; ++i ){
-		if (side & (1<<sides[i].side) ){
-			sides[i].func(&(sides[i].arg));
-		}
-	}
+	sidehandle();
 }
 
 void movemouse(const Arg *arg){
@@ -1660,6 +1636,33 @@ void scrolldeskvertical(const Arg *arg){
 
 void scrolldeskhorizontal(const Arg *arg){
 	scrolldesk(selmon, arg->i, 0, arg->b);
+}
+
+void sidehandle(void){
+	int i, x, y, side;
+	if( !getrootptr(&x, &y) ){ return; }
+	side = 0 ;
+	if(x==sw-1){
+		side |= 1<<SideRight ;
+	}else if(!x){
+		side |= 1<<SideLeft ;
+	}
+	
+	if(y==sh-1){
+		side |= 1<<SideDown ;
+	}else if(!y){
+		side |= 1<<SideUp ;
+	}
+
+	if(!side){
+		side |= 1<<SideNo ;
+	}
+
+	for( i = 0 ; i<LENGTH(sides) ; ++i ){
+		if (side & (1<<sides[i].side) ){
+			sides[i].func(&(sides[i].arg));
+		}
+	}
 }
 
 void monwinsmove(Monitor *m, int dx, int dy){
