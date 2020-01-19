@@ -1113,7 +1113,6 @@ void motionnotify(XEvent *e){
 		focus(NULL);
 	}
 	mon = m ;
-	sidehandle();
 }
 
 void movemouse(const Arg *arg){
@@ -1621,7 +1620,7 @@ void scrolldesk(Monitor *m, int dx, int dy, bool warpptr){
 	if(m->lt[m->sellt] != &layouts[LayoutFloating]){ return ; }
 	if( warpptr ){
 		/* Move pointer with windows. */
-		if(m->showbar || !getrootptr(&x, &y)){ return; }
+		if( !getrootptr(&x, &y) ){ return; }
 		monwinsmove(m, dx, dy);
 		XWarpPointer(dpy, None, root, 0, 0, 0, 0, x+dx, y+dy);
 	}else{
@@ -2060,11 +2059,12 @@ XEvent *mousewaituntilevent(int type){
 	do{
 		XMaskEvent(dpy, MOUSEMASK|ExposureMask|SubstructureRedirectMask, ev);
 		switch( ev->type ){
-		case MotionNotify:
 		case ConfigureRequest :
 		case Expose :
 		case MapRequest :
 			handler[ev->type](ev);
+		case MotionNotify:
+			sidehandle();
 		break;
 		}
 	}while( ev->type != type );
