@@ -1,7 +1,7 @@
 # Configuration for GNU/Linux systems.
 
 # Standard programs.
-RM      = rm -rf
+RM      = rm -Rf
 INSTALL = install
 TAR     = tar -cf
 GZIP    = gzip -f
