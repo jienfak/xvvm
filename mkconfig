@@ -1,0 +1,5 @@
+CC = tcc
+LD = tcc
+ROOT = /usr/local
+
+ADDFLAGS = -O3
