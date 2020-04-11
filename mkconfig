@@ -1,5 +1,6 @@
 CC = tcc
 LD = tcc
 ROOT = /usr/local
+X11R6 = /usr/X11R6
 
 ADDFLAGS = -O3

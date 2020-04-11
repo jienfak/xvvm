@@ -2,8 +2,8 @@
 
 VERSION = 6.2
 CPPFLAGS = -DVERSION=\"$VERSION\"
-CFLAGS = -I/usr/X11R6/include -I/usr/include/freetype2
-LDFLAGS = -L/usr/X11R6/include -lX11 -lfontconfig -lXft
+CFLAGS = -I$X11R6/include -I/usr/include/freetype2
+LDFLAGS = -L$X11R6/include -lX11 -lfontconfig -lXft
 
 SRC = `{ ls *.c }
 OBJ = ${SRC:%.c=%.o}
