@@ -20,10 +20,9 @@ $TGT : $OBJ
 	echo -n
 %.h :Q:
 	echo -n
-install : $TGT $TGT.1
+install : $TGT
 	cp -f $TGT $ROOT/bin/
-	sed s/VERSION/$VERSION/g < $TGT.1 > $ROOT/share/man/man1/$TGT.1
-	chmod 0755 $ROOT/bin/$TGT $ROOT/share/man/man1/$TGT.1
+	chmod 0755 $ROOT/bin/$TGT 
 uninstall: 
 	rm -f $ROOT/share/man/man1/$TGT.1 $ROOT/bin/$TGT
 clean :

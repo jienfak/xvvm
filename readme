@@ -1,5 +1,18 @@
-vvm - dwm with new features.
+xvvm - dwm with new features like:
+	Desktop scrolling;
+	No animation for moving and resizing windows;
+	Other.
+Changes are made because of my WM using experience.
+I tried to make it even simpler than it was.
+To understand usage of it read "config.h".
 
+Before installation check "mkconfig" and set variables for your system
+and additional compiler flags by your wish.
+To install:
+	# mk install
+Yes, you need mk for it. You can get in "plan9port".
+
+Original "README".
 dwm - dynamic window manager
 ============================
 dwm is an extremely fast, small, and dynamic window manager for X.
