@@ -8,7 +8,7 @@ LDFLAGS = -L$X11R6/include -lX11 -lfontconfig -lXft
 SRC = `{ ls *.c }
 OBJ = ${SRC:%.c=%.o}
 HDR = `{ ls *.h }
-TGT = vvm
+TGT = xvvm
 
 all :VQ: $TGT
 	echo -n

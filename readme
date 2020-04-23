@@ -4,60 +4,28 @@ xvvm - dwm with new features like:
 	Other.
 Changes are made because of my WM using experience.
 I tried to make it even simpler than it was.
-To understand usage of it read "config.h".
+
+To understand usage of it(hotkeys etc.) read "config.h". Comments will help you.
 
 Before installation check "mkconfig" and set variables for your system
 and additional compiler flags by your wish.
 To install:
 	# mk install
-Yes, you need mk for it. You can get in "plan9port".
+Yes, you need mk for it. You can get in "plan9port" or somewhere else.
 
-Original "README".
-dwm - dynamic window manager
-============================
-dwm is an extremely fast, small, and dynamic window manager for X.
-
-
-Requirements
-------------
-In order to build dwm you need the Xlib header files.
-
-
-Installation
-------------
-Edit config.mk to match your local setup (dwm is installed into
-the /usr/local namespace by default).
-
-Afterwards enter the following command to build and install dwm (if
-necessary as root):
-
-    make clean install
-
-
-Running dwm
------------
-Add the following line to your .xinitrc to start dwm using startx:
-
-    exec dwm
-
-In order to connect dwm to a specific display, make sure that
+In order to connect xvvm to a specific display, make sure that
 the DISPLAY environment variable is set correctly, e.g.:
+    $ DISPLAY=foo.bar:1 startx [xinitrc_path] xvvm
+(This will start xvvm on display :1 of the host foo.bar.)
 
-    DISPLAY=foo.bar:1 exec dwm
+The WM name is showed in right up corner of screen when running. 
+It can be changed by:
+    $ xsetroot -name [string]
+So you can change it with scripts as you wish.
+Mostly it looks like:
+	while xsetroot -name [some_evaluating_stuff] ; do
+		sleep [time_between changings]
+	done &
+In other scripts(Read about "xinitrc" file).
 
-(This will start dwm on display :1 of the host foo.bar.)
-
-In order to display status info in the bar, you can do something
-like this in your .xinitrc:
-
-    while xsetroot -name "`date` `uptime | sed 's/.*,//'`"
-    do
-    	sleep 1
-    done &
-    exec dwm
-
-
-Configuration
--------------
-The configuration of dwm is done by creating a custom config.h
-and (re)compiling the source code.
+P. S. I love you, Suckless. Thank you.
