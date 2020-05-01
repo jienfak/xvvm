@@ -67,7 +67,7 @@ static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
 	XMODMAP_MERGE \
 	"xset r rate \"$KEYBOARD_REPEAT_DELAY\" \"$KEYBOARD_REPEAT_RATE\" ;" \
 	"xrdb -merge \"$XRESOURCES\" ; " \
-	"eval \"$VVM_RCCMD\" ") ;
+	"eval \"$XVVM_RCCMD\" ") ;
 
 /* Helper to spawn application in terminal. */
 static char *runcmd[] = SHCMD("eval \"$XVVM_RUN_CMD\" " ) ; /* Menu run. */
