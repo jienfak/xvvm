@@ -174,7 +174,7 @@ static Button buttons[] = {
 	/* Calling terminal. */
 	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
 	/* Calling pop up menu. */
-	{ ClkRootWin, 0, Button3, spawn, {.v = popcmd } },
+	{ ClkStatusText, 0, Button2, spawn, {.v = popcmd } },
 	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	{ ClkWinTitle, 0, Button1, moveclick, {0} },
