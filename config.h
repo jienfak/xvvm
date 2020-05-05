@@ -44,9 +44,9 @@ static const int resizehints = 1 ; /* 1 means respect size hints in tiled resiza
 static const Layout layouts[] = {
 	/* Standard is ALWAYS floating. */
 	/* Symbol, arrange function. */
-	[LayoutFloating] = { "[F]",      NULL }, /* No layout function means floating behavior. */
-	[LayoutTile] = { "[T]",      tile }, /* Tiled layout. */
-	[LayoutMonocle] = { "[M]",      monocle }, /* Maximized layout. */
+	[LayoutFloating] = { "[F]", NULL }, /* No layout function means floating behavior. */
+	[LayoutTile] = { "[T]", tile }, /* Tiled layout. */
+	[LayoutMonocle] = { "[M]", monocle }, /* Maximized layout. */
 } ;
 
 /* Key definitions. */
@@ -60,33 +60,37 @@ static const Layout layouts[] = {
 static char menumon[] = "0" ;
 /* Easier CMD assigning. $1 in scripts is current monitor. */
 #define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, menumon, NULL }/*)*/
+#define XMODMAP_MERGE " test -r  $XMODMAP && xmodmap $XMODMAP "
+#define SETWMNAME(str) "xsetroot -name "str" "
 
 /* It is called on "vvm" start. */
-#define XMODMAP_MERGE " [ -r \"$XMODMAP\" ] && xmodmap $XMODMAP ;"
-static char *rccmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
-	XMODMAP_MERGE \
+static char *rccmd[] = SHCMD( SETWMNAME("dvorak") ";" \
+	"setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
+	XMODMAP_MERGE ";"\
 	"xset r rate \"$KEYBOARD_REPEAT_DELAY\" \"$KEYBOARD_REPEAT_RATE\" ;" \
 	"xrdb -merge \"$XRESOURCES\" ; " \
 	"eval \"$XVVM_RCCMD\" ") ;
 
 /* Helper to spawn application in terminal. */
 static char *runcmd[] = SHCMD("eval \"$XVVM_RUN_CMD\" " ) ; /* Menu run. */
+static char *outruncmd[] = SHCMD(SETWMNAME("\"`echo | eval $(xmen -p :)`\"")) ;
 static char *termcmd[] = SHCMD("eval  \"$XVVM_TERMINAL\" ") ; /* Terminal run. */
 static char *popcmd[] = SHCMD("eval  \"$XVVM_POP_UP_MENU\" ") ; /* Pop up menu. */
 /* Keyboard layouts. */
-static const char *dvorakkbdcmd[] = SHCMD("setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
-static const char *dvpkbdcmd[] = SHCMD("setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
-static const char *natkbdcmd[] = SHCMD("setxkbmap $NATIVE_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
-static const char *qwertykbdcmd[] = SHCMD("setxkbmap $QWERTY_KEYBOARD_LAYOUT ;" XMODMAP_MERGE) ;
+static const char *dvorakkbdcmd[] = SHCMD(SETWMNAME("dvorak") "; setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" );
+static const char *dvpkbdcmd[] = SHCMD(SETWMNAME("dvp") "; setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
+static const char *natkbdcmd[] = SHCMD(SETWMNAME("native")"; setxkbmap $NATIVE_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
+static const char *qwertykbdcmd[] = SHCMD(SETWMNAME("qwerty")"; setxkbmap $QWERTY_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
 
 static Key keys[] = {
 	/* Modifier, key, function, argument. */
 	/* Program spawners. */
 	{MODKEY|ShiftMask, XK_Return, spawn, {.v = termcmd} }, /* Terminal. */
 	{MODKEY|ShiftMask, XK_r, spawn, {.v = runcmd} }, /* Run CMD. (dmenu most the time) */
-	/* Clients stuff and input. (The most needed) */
+	{MODKEY|ShiftMask, XK_c, spawn, {.v = outruncmd} }, /* Run CMD and set it's output to WMname. */
+	/* Clients stuff and input. (The most often used) */
 	{ MODKEY, XK_a, spawn, {.v = qwertykbdcmd} }, /* Qwerty. */
-	{ MODKEY, XK_Tab,    spawn, {.v = dvorakkbdcmd} }, /* Dvorak. */
+	{ MODKEY, XK_Tab, spawn, {.v = dvorakkbdcmd} }, /* Dvorak. */
 	{ MODKEY, XK_BackSpace, spawn, {.v = natkbdcmd} }, /* Alternative. */
 	{ MODKEY, XK_Return, spawn, {.v = dvpkbdcmd} }, /* Dvorak programmer. */
 	{ MODKEY, XK_x, killclient, {0} }, /* Close current window. */
