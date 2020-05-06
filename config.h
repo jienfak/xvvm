@@ -47,6 +47,7 @@ static const Layout layouts[] = {
 	[LayoutFloating] = { "[F]", NULL }, /* No layout function means floating behavior. */
 	[LayoutTile] = { "[T]", tile }, /* Tiled layout. */
 	[LayoutMonocle] = { "[M]", monocle }, /* Maximized layout. */
+	[LayoutSplit] = {"[S]", split},  /* Split layout. */
 } ;
 
 /* Key definitions. */
@@ -108,6 +109,7 @@ static Key keys[] = {
 	{ MODKEY|ControlMask, XK_j, scrolldeskvertical, {.i = -300, .b = false} },
 	{ MODKEY, XK_r, zoom, {0} }, /* Current choosen window master. */
 	{ MODKEY, XK_t, setlayout, {.v = &layouts[LayoutTile]} }, /* Tile layout. */
+	{ MODKEY, XK_s, setlayout, {.v = &layouts[LayoutSplit]}}, /* Split layout. */
 	{ MODKEY, XK_f, setlayout, {.v = &layouts[LayoutFloating]} }, /* Floating layout. */
 	{ MODKEY, XK_m, setlayout, {.v = &layouts[LayoutMonocle]} }, /* Maximized layout. */
 	{ MODKEY|ShiftMask, XK_space,  setlayout, {0} },  /* Toggle layout. */

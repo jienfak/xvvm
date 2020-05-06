@@ -69,7 +69,7 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast } ; /* Default atoms. */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast } ; /* Clicks. */
-enum {LayoutFloating, LayoutTile, LayoutMonocle} ;
+enum {LayoutFloating, LayoutTile, LayoutMonocle, LayoutSplit} ;
 enum {SideNo, SideRight, SideLeft, SideUp, SideDown} ;
 
 /* Used to define users functions behavior. */
@@ -239,6 +239,7 @@ static void sidehandle(void);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *);
+static void split(Monitor *);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -1856,12 +1857,55 @@ tile(Monitor *m)
 	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++){
 		if( i < m->nmaster ){
 			h = (m->wh - my) / (MIN(n, m->nmaster) - i) ;
-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
+			resize(c,
+				m->wx, m->wy + my,
+				mw - (2*c->bw), h - (2*c->bw),
+				0
+			);
 			my += HEIGHT(c) ;
 		}else{
 			h = (m->wh - ty) / (n - i) ;
-			resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), 0) ;
+			resize(c,
+				m->wx + mw, m->wy + ty,
+				m->ww - mw - (2*c->bw), h - (2*c->bw),
+				0
+			);
 			ty += HEIGHT(c) ;
+		}
+	}
+}
+
+void
+split(Monitor* m)
+{
+	unsigned int i, n, w, mh, mx, tx;
+	Client *c;
+	for( n=0, c = nexttiled(m->clients) ; c ; c = nexttiled(c->next), ++n )
+		;
+	if(!n) return ;
+	
+	if( n> m->nmaster ){
+		mh = m->nmaster ? m->wh * m->mfact : 0 ;
+	}else{
+		mh = m->wh ;
+	}
+	for( i=mx=tx=0, c=nexttiled(m->clients) ; c ; c=nexttiled(c->next), i++){
+		if( i < m->nmaster ){
+			w = (m->ww - mx) / (MIN(n, m->nmaster) - i) ;
+			resize(c,
+				m->wx + mx, m->wy,
+				w - (2*c->bw),  mh - (2*c->bw),
+				0
+			);
+			mx += WIDTH(c) ;
+		}else{
+			w = (m->ww-tx) / (n-i) ;
+			resize(c,
+				m->wx+tx,  m->wy+mh,
+				w-(2*c->bw), m->wh-mh-(2*c->bw),
+				0
+			);
+			tx += WIDTH(c) ;
 		}
 	}
 }
