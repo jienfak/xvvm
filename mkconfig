@@ -1,6 +1,9 @@
 CC = tcc
 LD = tcc
-ROOT = /usr/local
+NAME = xvvm
+USR = $HOME
+ROOT = $USR/local
+BIN = $ROOT/bin
 X11R6 = /usr/X11R6
 
 ADDFLAGS = -O3

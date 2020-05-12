@@ -10,7 +10,7 @@ To understand usage of it(hotkeys etc.) read "config.h". Comments will help you.
 Before installation check "mkconfig" and set variables for your system
 and additional compiler flags by your wish.
 To install:
-	# mk install
+	$ mk install
 Yes, you need mk for it. You can get in "plan9port" or somewhere else.
 
 In order to connect xvvm to a specific display, make sure that

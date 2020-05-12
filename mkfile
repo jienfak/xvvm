@@ -8,7 +8,7 @@ LDFLAGS = -L$X11R6/include -lX11 -lfontconfig -lXft
 SRC = `{ ls *.c }
 OBJ = ${SRC:%.c=%.o}
 HDR = `{ ls *.h }
-TGT = xvvm
+TGT = $NAME
 
 all :VQ: $TGT
 	echo -n
@@ -21,9 +21,9 @@ $TGT : $OBJ
 %.h :Q:
 	echo -n
 install : $TGT
-	cp -f $TGT $ROOT/bin/
-	chmod 0755 $ROOT/bin/$TGT 
+	cp -f $TGT $BIN
+	chmod 0755 $BIN/$TGT 
 uninstall: 
-	rm -f $ROOT/share/man/man1/$TGT.1 $ROOT/bin/$TGT
+	rm -f $BIN/$TGT
 clean :
 	rm -rf $TGT *.o 
