@@ -69,8 +69,14 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast } ; /* Default atoms. */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast } ; /* Clicks. */
-enum {LayoutFloating, LayoutTile, LayoutMonocle, LayoutSplit} ;
+enum {LayoutFloating, LayoutTile, LayoutMonocle, LayoutSplit, LayoutLast} ;
 enum {SideNo, SideRight, SideLeft, SideUp, SideDown} ;
+
+typedef struct {
+	int lt;
+	float mfact;
+	int nmaster;
+} SetupLayout ;
 
 /* Used to define users functions behavior. */
 typedef struct {
@@ -138,6 +144,8 @@ struct Monitor {
 	unsigned int seltags;
 	unsigned int sellt;
 	unsigned int tagset[2];
+	SetupLayout taglt[9];
+	unsigned int viewtag;
 	int showbar;
 	int topbar;
 	Client *clients;
@@ -500,7 +508,7 @@ buttonpress(XEvent *e)
 	}
 	for (i = 0; i < LENGTH(buttons); i++)
 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
-		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
+				&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
 			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
 }
 
@@ -693,7 +701,12 @@ Monitor
 	m->lt[0] = &layouts[0] ;
 	m->lt[1] = &layouts[1 % LENGTH(layouts)] ;
 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
-	return m;
+	for( int i=0 ; i<9 ; ++i ){
+		m->taglt[i].lt = setup_layouts[i].lt ;
+		m->taglt[i].mfact = setup_layouts[i].mfact ;
+		m->taglt[i].nmaster = setup_layouts[i].nmaster ;
+	}
+	return m ;
 }
 
 void
@@ -1043,7 +1056,8 @@ grabkeys(void)
 void
 incnmaster(const Arg *arg)
 {
-	selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
+	selmon->taglt[selmon->viewtag].nmaster =
+		selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
 	arrange(selmon);
 }
 
@@ -1277,7 +1291,7 @@ nextlayout(const Arg *arg)
 {
 	Monitor *m = selmon ;
 	Arg varg;
-	int lt = ( m->lt[m->sellt] - layouts+ arg->i )   ;
+	int lt = ( m->lt[m->sellt] - layouts + arg->i )   ;
 	if( lt<0 ){
 		lt = LENGTH(layouts) - 1 ;
 	}else{
@@ -1596,34 +1610,52 @@ setfullscreen(Client *c, int fullscreen)
 void
 setlayout(const Arg *arg)
 {
-	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt]){
-		selmon->sellt ^= 1 ;
+	Monitor *m = selmon ;
+	if (!arg || !arg->v || arg->v != m->lt[m->sellt]){
+		m->sellt ^= 1 ;
 	}
+	
 	if (arg && arg->v){
-		selmon->lt[selmon->sellt] = (Layout *)arg->v;
+		m->lt[m->sellt] = (Layout *)arg->v ;
+		m->taglt[m->viewtag].lt = (Layout *)arg->v - layouts ;
 	}
-	strncpy( selmon->ltsymbol,
-		selmon->lt[selmon->sellt]->symbol,
-		sizeof(selmon->ltsymbol) );
-	if (selmon->sel){
-		arrange(selmon);
+
+	strncpy( m->ltsymbol,
+		m->lt[m->sellt]->symbol,
+		sizeof(m->ltsymbol) );
+
+	if (m->sel){
+		arrange(m);
 	}else{
-		drawbar(selmon);
+		drawbar(m);
 	}
 }
 
+unsigned int
+ntiled(Monitor *m)
+{
+	unsigned int n;
+	Client *c;
+	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), ++n)
+		;
+	return n ;
+}
 /* arg > 1.0 will set mfact absolutely. */
 void
 setmfact(const Arg *arg)
 {
 	float f;
-
-	if (!arg || !selmon->lt[selmon->sellt]->arrange)
+	Monitor *m = selmon ;
+	if(ntiled(m)<2 || (m->lt[m->sellt] == layouts) )
 		return;
-	f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
+	if (!arg || !m->lt[m->sellt]->arrange)
+		return;
+	f = arg->f < 1.0 ?
+		arg->f + m->mfact :
+			arg->f - 1.0;
 	if (f < 0.1 || f > 0.9)
 		return;
-	selmon->mfact = f;
+	m->taglt[m->viewtag].mfact = m->mfact = f;
 	arrange(selmon);
 }
 
@@ -2261,16 +2293,43 @@ updatewmhints(Client *c)
 		XFree(wmh);
 	}
 }
+void
+setupview(int nview)
+{
+	Monitor *m = selmon ;
+	m->viewtag = nview ;
+	m->mfact = m->taglt[nview].mfact ;
+	m->nmaster = m->taglt[nview].nmaster ;
+	m->lt[m->sellt] = &layouts[ m->taglt[nview].lt ] ;
+}
+
+int
+bitid(unsigned int bits)
+{
+	if(!bits)
+		return -1 ;
+	for( int i=0 ; i<sizeof(int)*8 ; ++i)
+		if( (bits>>i) & 1 )
+			return i ;
+	
+	/* Not reachable. */
+	return -1 ;
+}
 
 void
 view(const Arg *arg)
-{
-	if((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags]){
+{	
+	Monitor *m = selmon ;
+	unsigned int mask = arg->ui ;
+	unsigned int tagid = bitid(arg->ui) ;
+	if((mask & TAGMASK) == m->tagset[selmon->seltags]){
 		return;
 	}
-	selmon->seltags ^= 1 ; /* toggle sel tagset */
-	if(arg->ui & TAGMASK){
-		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+	m->seltags ^= 1 ; /* toggle sel tagset */
+
+	if(mask & TAGMASK){
+		m->tagset[m->seltags] = mask&TAGMASK ;
+		setupview(tagid);
 	}
 	focus(NULL);
 	arrange(selmon);
