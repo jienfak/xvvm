@@ -1,10 +1,5 @@
 <mkconfig
 
-VERSION = 6.2
-CPPFLAGS = -DVERSION=\"$VERSION\"
-CFLAGS = -I$X11R6/include -I/usr/include/freetype2
-LDFLAGS = -L$X11R6/include -lX11 -lfontconfig -lXft
-
 SRC = `{ ls *.c }
 OBJ = ${SRC:%.c=%.o}
 HDR = `{ ls *.h }
@@ -15,7 +10,7 @@ all :VQ: $TGT
 $TGT : $OBJ
 	$LD $LDFLAGS -o $target $prereq
 %.o : %.c
-	$CC $ADDFLAGS $CFLAGS $CPPFLAGS -c -o $target $prereq
+	$CC $CFLAGS $CPPFLAGS -c -o $target $prereq
 %.c :Q: $HDR
 	echo -n
 %.h :Q:

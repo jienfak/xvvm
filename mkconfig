@@ -1,9 +1,53 @@
+# Compiler.
 CC = tcc
-LD = tcc
-NAME = xvvm
-USR = $HOME
-ROOT = $USR/local
-BIN = $ROOT/bin
-X11R6 = /usr/X11R6
+# Linker.
+LD = $CC
 
-ADDFLAGS = -O3
+# Program name. Output binary name.
+NAME = xvvm
+
+# Version.
+VERSION = 6.2
+
+# Installation directory.
+ROOT = $HOME/local
+# Binary executable directory.
+BIN = $ROOT/bin
+
+# X11 development files.
+X11 = /usr/X11R6
+X11INC = -I$X11/include
+X11LIB = -lX11
+
+# Freetype.
+FTINC = -I/usr/include/freetype2
+FTLIB = -lfontconfig -lXft
+
+# Xinerama.
+XINLIB = -lXinerama
+
+# Additional flags for compiler, linker and Cpreprocessor.
+# Read your compiler manual for it.
+ADDCFLAGS =
+ADDLDFLAGS =
+ADDCPPFLAGS =
+
+# For Xinerama support.
+ADDCPPFLAGS = $ADDCPPFLAGS -DXINERAMA
+ADDLDFLAGS = $ADDLDFLAGS $XINLIB
+
+# After this line file is not supposed to be edited.
+
+INC = $X11INC $FTINC $ADDINC
+LIB = $X11LIB $FTLIB $ADDLIB
+
+CPPFLAGS = $INC \
+	-DVERSION=\"$VERSION\" \
+	-D_DEFAULT_SOURCE -D_BSD_SOURCE -D_POSIC_C_SOURCE=200809L \
+	$ADDCPPFLAGS
+
+CFLAGS = \
+	$ADDCPPFLAGS
+
+LDFLAGS = $LIB\
+	$ADDLDFLAGS

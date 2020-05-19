@@ -34,7 +34,7 @@ static const int resizehints = 1 ; /* 1 means respect size hints in tiled resiza
 
 
 /* Tag which you start with. */
-static const tagview = 1 ;
+static const unsigned int tagview = 1 ;
 
 /* Layouts on the tags you get when start WM. */
 static const SetupLayout setup_layouts[9] = {
@@ -218,5 +218,4 @@ static Side sides[] = {
 	{SideUp, scrolldeskvertical, {.i = +500, .b = true} },
 	{SideDown, scrolldeskvertical, {.i = -500, .b = true} },
 } ;
-/* Behaviour. */
-static char autoraise = (char)0 ;
+

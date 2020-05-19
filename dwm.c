@@ -218,7 +218,6 @@ static Client *nexttiled(Client *c);
 static void nextlayout(const Arg *arg);
 static void pop(Client *);
 static void propertynotify(XEvent *e);
-static void prevlayout(const Arg *arg);
 static void quit(const Arg *arg);
 static Monitor *recttomon(int x, int y, int w, int h);
 static void resize(Client *c, int x, int y, int w, int h, int interact);
@@ -1271,7 +1270,6 @@ void
 moveclick(const Arg *arg)
 {
 	int x, y;
-	XEvent *ev;
 	if( !getrootptr(&x, &y) ){
 		return;
 	}
