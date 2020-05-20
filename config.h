@@ -85,7 +85,6 @@ static char *rccmd[] = SHCMD( SETWMNAME("dvorak") ";" \
 static char *runcmd[] = SHCMD("eval \"$XVVM_RUN_CMD\" " ) ; /* Menu run. */
 static char *outruncmd[] = SHCMD(SETWMNAME("\"`echo | eval $(xmen -p :)`\"")) ;
 static char *termcmd[] = SHCMD("eval  \"$XVVM_TERMINAL\" ") ; /* Terminal run. */
-static char *popcmd[] = SHCMD("eval  \"$XVVM_POP_UP_MENU\" ") ; /* Pop up menu. */
 /* Keyboard layouts. */
 static const char *dvorakkbdcmd[] = SHCMD(SETWMNAME("dvorak") "; setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" );
 static const char *dvpkbdcmd[] = SHCMD(SETWMNAME("dvp") "; setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
@@ -184,8 +183,6 @@ static Button buttons[] = {
 	{ ClkWinTitle, 0, Button5, focusstack, {.i = -1 } }, 
 	/* Calling terminal. */
 	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
-	/* Calling pop up menu. */
-	{ ClkStatusText, 0, Button2, spawn, {.v = popcmd } },
 	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	{ ClkWinTitle, 0, Button1, moveclick, {0} },
