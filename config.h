@@ -1,6 +1,7 @@
-/* See LICENSE file for copyright and license details. */
-
+/* See "license" file for copyright and license details. */
 /* Jien's config. */
+/* For work requires "rc". (Can be taken from "plan9port") */
+
 /* Appearance. */
 static const unsigned int borderpx  = 1 ; /* Border pixel of windows. */
 static const unsigned int snap = 10 ; /* Snap pixel. */
@@ -69,34 +70,71 @@ static const Layout layouts[] = {
 
 static char menumon[] = "0" ;
 /* Easier CMD assigning. $1 in scripts is current monitor. */
-#define SHCMD(cmd) /*((const char*[])*/ { "/bin/sh", "-c", cmd, menumon, NULL }/*)*/
-#define XMODMAP_MERGE " test -r  $XMODMAP && xmodmap $XMODMAP "
-#define SETWMNAME(str) "xsetroot -name "str" "
+#define SHCMD(cmd) { "/bin/env", "rc", "-l", "-c", cmd, menumon, NULL }/*)*/
 
-/* It is called on "vvm" start. */
-static char *rccmd[] = SHCMD( SETWMNAME("dvorak") ";" \
-	"setxkbmap $DVORAK_KEYBOARD_LAYOUT ; " \
+#define XRESOURCES "$home/.Xresources"
+#define XRESOURCES_MERGE "test -r "XRESOURCES" && xrdb -merge "XRESOURCES
+
+#define XMODMAP "$home/.Xmodmap"
+#define XMODMAP_MERGE " test -r "XMODMAP" && xmodmap "XMODMAP
+/* Setting of window manager name which let you change the title in right up corner. */
+#define SETWMNAME(str) "out = `{echo -n "str"} ; xsetroot -name $\"out"
+
+/* Keyboard. */
+#define SET_KB_LT "setxkbmap"
+
+/* Native map for your language. */
+#define NATIVE_KB_MAP "ru"
+
+/* Option. */
+#define KB_OPTION "grp:alt_space_toggle"
+
+/* Dvorak. */
+#define DVORAK_KB_LT "-layout us,"NATIVE_KB_MAP" -variant dvorak, -option "KB_OPTION
+#define SET_DVORAK_KB_LT SET_KB_LT" "DVORAK_KB_LT
+
+/* Programmer dvorak. */
+#define DVP_KB_LT "-layout us,"NATIVE_KB_MAP" -variant dvp, -option "KB_OPTION
+#define SET_DVP_KB_LT SET_KB_LT" "DVP_KB_LT
+
+/* Qwerty. */
+#define QWERTY_KB_LT"-layout us,"NATIVE_KB_MAP" -option "KB_OPTION
+#define SET_QWERTY_KB_LT SET_KB_LT" "QWERTY_KB_LT
+
+/* Native layout. */
+#define NATIVE_KB_LT "-layout us,"NATIVE_KB_MAP" -variant dvp, -option "KB_OPTION
+#define SET_NATIVE_KB_LT SET_KB_LT" "NATIVE_KB_LT
+
+/* Keyboard options. */
+#define KB_REPEAT_RATE "60"
+#define KB_REPEAT_DELAY "300"
+#define SET_KB_OPTIONS "xset r rate "KB_REPEAT_DELAY" "KB_REPEAT_RATE
+
+/* It is called on "xvvm" start. */
+static char *rccmd[] = SHCMD( SETWMNAME("Hello, `{whoami}") ";" \
+	SET_DVORAK_KB_LT ";" \
 	XMODMAP_MERGE ";"\
-	"xset r rate \"$KEYBOARD_REPEAT_DELAY\" \"$KEYBOARD_REPEAT_RATE\" ;" \
-	"xrdb -merge \"$XRESOURCES\" ; " \
-	"eval \"$XVVM_RCCMD\" ") ;
+	SET_KB_OPTIONS";" \
+	XRESOURCES_MERGE";" ) ;
 
-/* Helper to spawn application in terminal. */
-static char *runcmd[] = SHCMD("eval \"$XVVM_RUN_CMD\" " ) ; /* Menu run. */
-static char *outruncmd[] = SHCMD(SETWMNAME("\"`echo | eval $(xmen -p :)`\"")) ;
-static char *termcmd[] = SHCMD("eval  \"$XVVM_TERMINAL\" ") ; /* Terminal run. */
+/* Spawners. */
+static char *runcmd[] = SHCMD(" eval `{echo -n | xmen -p ';' } ") ; /* Menu run. */
+static char *outruncmd[] = SHCMD(SETWMNAME("`{ eval `{echo -n | xmen -p ';'} }")) ; /* Set WM name to output of command. */
+static char *termcmd[] = SHCMD("xtrm") ; /* Terminal run. */
+static char *termtcmd[] = SHCMD("9term rc -l") ; /* Text buffer terminal to run. */
 /* Keyboard layouts. */
-static const char *dvorakkbdcmd[] = SHCMD(SETWMNAME("dvorak") "; setxkbmap $DVORAK_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" );
-static const char *dvpkbdcmd[] = SHCMD(SETWMNAME("dvp") "; setxkbmap $DVP_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
-static const char *natkbdcmd[] = SHCMD(SETWMNAME("native")"; setxkbmap $NATIVE_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
-static const char *qwertykbdcmd[] = SHCMD(SETWMNAME("qwerty")"; setxkbmap $QWERTY_KEYBOARD_LAYOUT ;" XMODMAP_MERGE ";" ) ;
+static const char *dvorakkbdcmd[] = SHCMD(SETWMNAME("dvorak") ";"SET_DVORAK_KB_LT ";" XMODMAP_MERGE ";" );
+static const char *dvpkbdcmd[] = SHCMD(SETWMNAME("dvp") ";" SET_DVP_KB_LT ";" XMODMAP_MERGE ";" ) ;
+static const char *natkbdcmd[] = SHCMD(SETWMNAME("native")";" SET_NATIVE_KB_LT ";" XMODMAP_MERGE ";" ) ;
+static const char *qwertykbdcmd[] = SHCMD(SETWMNAME("qwerty")";" SET_QWERTY_KB_LT ";" XMODMAP_MERGE ";" ) ;
 
 static Key keys[] = {
 	/* Modifier, key, function, argument. */
 	/* Program spawners. */
-	{MODKEY|ShiftMask, XK_Return, spawn, {.v = termcmd} }, /* Terminal. */
-	{MODKEY|ShiftMask, XK_r, spawn, {.v = runcmd} }, /* Run CMD. (dmenu most the time) */
-	{MODKEY|ShiftMask, XK_c, spawn, {.v = outruncmd} }, /* Run CMD and set it's output to WMname. */
+	{ MODKEY|ShiftMask, XK_Return, spawn, {.v = termcmd} }, /* Terminal. */
+	{ MODKEY|ShiftMask, XK_t, spawn, {.v = termtcmd} }, /* Text buffer terminal. */
+	{ MODKEY|ShiftMask, XK_r, spawn, {.v = runcmd} }, /* Run CMD. (dmenu most the time) */
+	{ MODKEY|ShiftMask, XK_c, spawn, {.v = outruncmd} }, /* Run CMD and set it's output to WMname. */
 	/* Clients stuff and input. (The most often used) */
 	{ MODKEY, XK_a, spawn, {.v = qwertykbdcmd} }, /* Qwerty. */
 	{ MODKEY, XK_Tab, spawn, {.v = dvorakkbdcmd} }, /* Dvorak. */
@@ -181,8 +219,9 @@ static Button buttons[] = {
 	/* Changing focus. */
 	{ ClkWinTitle, 0, Button4, focusstack, {.i = +1 } }, 
 	{ ClkWinTitle, 0, Button5, focusstack, {.i = -1 } }, 
-	/* Calling terminal. */
+	/* Calling terminals. */
 	{ ClkRootWin, 0, Button2, spawn, {.v = termcmd } },
+	{ ClkStatusText, 0, Button2, spawn, {.v = termtcmd } },
 	/* Moving window by mouse. */
 	{ ClkClientWin, MODKEY, Button1, movemouse, {0} },
 	{ ClkWinTitle, 0, Button1, moveclick, {0} },

@@ -12,9 +12,9 @@ $TGT : $OBJ
 %.o : %.c
 	$CC $CFLAGS $CPPFLAGS -c -o $target $prereq
 %.c :Q: $HDR
-	echo -n
+	touch $target
 %.h :Q:
-	echo -n
+	touch $target
 install : $TGT
 	cp -f $TGT $BIN
 	chmod 0755 $BIN/$TGT 
