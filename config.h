@@ -102,7 +102,7 @@ static char menumon[] = "0" ;
 #define SET_QWERTY_KB_LT SET_KB_LT" "QWERTY_KB_LT
 
 /* Native layout. */
-#define NATIVE_KB_LT "-layout us,"NATIVE_KB_MAP" -variant dvp, -option "KB_OPTION
+#define NATIVE_KB_LT "-layout "NATIVE_KB_MAP",us -variant ,dvorak -option "KB_OPTION
 #define SET_NATIVE_KB_LT SET_KB_LT" "NATIVE_KB_LT
 
 /* Keyboard options. */
